@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm loại món ăn</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 400px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { text-align: center; margin-bottom: 24px; }
+        form { margin-top: 16px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 20px; background: #17a2b8; color: #fff; border: none; border-radius: 4px; font-size: 16px; }
+        button:hover { background: #138496; }
+        a { display: inline-block; margin-top: 16px; color: #007bff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Thêm loại món ăn</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Thêm</button>
+        </form>
+        <a href="{% url 'danh_sach_mon_an' %}">Quay lại danh sách món ăn</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách món ăn</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h2 { margin-top: 32px; color: #007bff; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+        th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
+        th { background: #f0f0f0; }
+        img { max-width: 80px; max-height: 60px; }
+        .status-true { color: green; font-weight: bold; }
+        .status-false { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Danh sách món ăn theo loại</h1>
+        <div style="margin-bottom: 24px;">
+            <a href="{% url 'them_monan' %}" style="padding: 8px 16px; background: #28a745; color: #fff; border-radius: 4px; text-decoration: none; margin-right: 10px;">+ Thêm món ăn</a>
+            <a href="{% url 'them_loaimonan' %}" style="padding: 8px 16px; background: #17a2b8; color: #fff; border-radius: 4px; text-decoration: none;">+ Thêm loại món ăn</a>
+        </div>
+        {% for group in data %}
+            <h2>{{ group.loai.TenLoaiMon }}</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên món ăn</th>
+                        <th>Ảnh</th>
+                        <th>Đơn giá</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for monan in group.monan_list %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ monan.TenMonAn }}</td>
+                        <td><img src="{{ monan.Anh }}" alt="Ảnh món ăn"></td>
+                        <td>{{ monan.DonGia }} VNĐ</td>
+                        <td class="status-{{ monan.TrangThai|yesno:'true,false' }}">
+                            {% if monan.TrangThai %}Còn{% else %}Hết{% endif %}
+                        </td>
+                        <td>
+                            <form action="{% url 'capnhat_trangthai_monan' monan.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" style="background:#ffc107;color:#222;border:none;padding:5px 10px;border-radius:4px;">Cập nhật trạng thái</button>
+                            </form>
+                            <a href="{% url 'sua_monan' monan.id %}" style="background:#007bff;color:#fff;padding:5px 10px;border-radius:4px;text-decoration:none;margin-left:4px;">Sửa</a>
+                            <form action="{% url 'xoa_monan' monan.id %}" method="post" style="display:inline;margin-left:4px;">
+                                {% csrf_token %}
+                                <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa món ăn này?');" style="background:#dc3545;color:#fff;border:none;padding:5px 10px;border-radius:4px;">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6">Không có món ăn nào.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    </div>
+</body>
+</html>

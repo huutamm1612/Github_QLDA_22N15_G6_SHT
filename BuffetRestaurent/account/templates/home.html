@@ -4,40 +4,187 @@
     <meta charset="UTF-8">
     <title>Trang quản trị nhà hàng buffet</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        .container { max-width: 500px; margin: 80px auto; background: #fff; padding: 40px 40px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); text-align: center; }
-        h1 { margin-bottom: 32px; color: #007bff; }
-        .btn-group { margin-top: 32px; }
-        a.button {
-            display: inline-block;
-            margin: 0 16px;
-            padding: 16px 32px;
-            background: #007bff;
-            color: #fff;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 20px;
-            font-weight: bold;
-            transition: background 0.2s;
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
         }
-        a.button:hover { background: #0056b3; }
-        .btn-group a.button.special {
+        .sidebar {
+            width: 260px;
+            min-height: 100vh;
+            background: #223366;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 48px 0 0 0;
+            box-shadow: 2px 0 18px 0 rgba(34,51,102,0.06);
+        }
+        .sidebar a.button,
+        .sidebar .logout-link {
+            width: 90%;
+            margin: 0 0 18px 0;
+            padding: 16px 24px;
+            border-radius: 10px 0 0 10px;
+            background: #223366;
+            color: #fff;
+            text-align: left;
+            font-size: 1.08rem;
+            font-weight: 500;
+            text-decoration: none;
+            border: none;
+            transition: background 0.18s, color 0.18s;
+            box-shadow: none;
+            display: block;
+        }
+        .sidebar a.button.special {
             background: #ffc107;
             color: #222;
+        }
+        .sidebar a.button.special:hover,
+        .sidebar a.button.special:focus {
+            background: #e0a800;
+            color: #222;
+        }
+        .sidebar a.button[style*="background:#28a745;"] {
+            background: #28a745 !important;
+            color: #fff !important;
+        }
+        .sidebar a.button[style*="background:#28a745;"]:hover,
+        .sidebar a.button[style*="background:#28a745;"]:focus {
+            background: #218838 !important;
+            color: #fff !important;
+        }
+        .sidebar a.button:hover,
+        .sidebar a.button:focus {
+            background: #2d4173;
+            color: #ffc107;
+        }
+        .sidebar .logout-link {
+            color: #dc3545;
+            background: #223366;
+            font-weight: 600;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-bottom: 0;
+            padding-left: 24px;
+        }
+        .sidebar .logout-link:hover,
+        .sidebar .logout-link:focus {
+            background: #dc3545;
+            color: #fff;
+        }
+        .logout-link-fixed {
+            position: fixed;
+            top: 24px;
+            right: 36px;
+            background: #dc3545;
+            color: #fff !important;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-size: 1.08rem;
+            font-weight: 600;
+            text-decoration: none;
+            z-index: 999;
+            transition: background 0.18s, color 0.18s;
+            box-shadow: 0 2px 8px rgba(220,53,69,0.08);
+        }
+        .logout-link-fixed:hover,
+        .logout-link-fixed:focus {
+            background: #a71d2a;
+            color: #fff !important;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        .container {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 6px 32px rgba(0,0,0,0.13);
+            padding: 60px 80px;
+            min-width: 420px;
+            min-height: 220px;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+            color: #007bff;
+            font-size: 2.4rem;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        @media (max-width: 900px) {
+            .container {
+                padding: 32px 10px;
+                min-width: unset;
+            }
+            .sidebar {
+                width: 100px;
+                padding: 24px 0 0 0;
+            }
+            .sidebar a.button,
+            .sidebar .logout-link {
+                font-size: 0.95rem;
+                padding: 12px 10px;
+                width: 95%;
+            }
+        }
+        @media (max-width: 600px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100vw;
+                flex-direction: row;
+                align-items: stretch;
+                padding: 0;
+                min-height: unset;
+                box-shadow: none;
+            }
+            .sidebar a.button,
+            .sidebar .logout-link {
+                width: 100%;
+                border-radius: 0;
+                margin: 0;
+                padding: 12px 4px;
+                text-align: center;
+            }
+            .main-content {
+                padding: 0;
+            }
+            .container {
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                min-width: unset;
+                min-height: unset;
+            }
+            .logout-link-fixed {
+                top: 10px;
+                right: 10px;
+                padding: 10px 16px;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Trang quản trị nhà hàng buffet</h1>
-        <div class="btn-group">
-            <a href="{% url 'danh_sach_mon_an' %}" class="button">Quản lý món ăn</a>
-            <a href="{% url 'danh_sach_ban_an' %}" class="button">Quản lý khu & bàn ăn</a>
-            <a href="{% url 'mo_ban' %}" class="button special">Mở bàn</a>
-            <a href="{% url 'bieu_do_doanh_thu' %}" class="button" style="background:#28a745;">Xem tình trạng kinh doanh</a>
-        </div>
-        <div style="margin-top: 40px;">
-            <a href="{% url 'logout' %}" style="color: #dc3545; font-size: 18px; text-decoration: underline;">Đăng xuất</a>
+    <div class="sidebar">
+        <a href="{% url 'mo_ban' %}" class="button special">Mở bàn</a>
+        <a href="{% url 'danh_sach_mon_an' %}" class="button">Quản lý món ăn</a>
+        <a href="{% url 'danh_sach_ban_an' %}" class="button">Quản lý khu & bàn ăn</a>
+        <a href="{% url 'bieu_do_doanh_thu' %}" class="button">Xem tình trạng kinh doanh</a>
+    </div>
+    <a href="{% url 'logout' %}" class="logout-link-fixed">Đăng xuất</a>
+    <div class="main-content">
+        <div class="container">
+            <h1>Trang quản trị nhà hàng buffet</h1>
         </div>
     </div>
 </body>

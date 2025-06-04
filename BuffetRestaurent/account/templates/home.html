@@ -75,6 +75,26 @@
             background: #dc3545;
             color: #fff;
         }
+        .logout-link-fixed {
+            position: fixed;
+            top: 24px;
+            right: 36px;
+            background: #dc3545;
+            color: #fff !important;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-size: 1.08rem;
+            font-weight: 600;
+            text-decoration: none;
+            z-index: 999;
+            transition: background 0.18s, color 0.18s;
+            box-shadow: 0 2px 8px rgba(220,53,69,0.08);
+        }
+        .logout-link-fixed:hover,
+        .logout-link-fixed:focus {
+            background: #a71d2a;
+            color: #fff !important;
+        }
         .main-content {
             flex: 1;
             display: flex;
@@ -145,32 +165,23 @@
                 min-width: unset;
                 min-height: unset;
             }
+            .logout-link-fixed {
+                top: 10px;
+                right: 10px;
+                padding: 10px 16px;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <a href="{% url 'mo_ban' %}" class="button special">Mở bàn</a>
-
         <a href="{% url 'danh_sach_mon_an' %}" class="button">Quản lý món ăn</a>
         <a href="{% url 'danh_sach_ban_an' %}" class="button">Quản lý khu & bàn ăn</a>
         <a href="{% url 'bieu_do_doanh_thu' %}" class="button">Xem tình trạng kinh doanh</a>
     </div>
-        <a href="{% url 'logout' %}" class="logout-link" style="
-        position: fixed;
-        top: 24px;
-        right: 36px;
-        background: #dc3545;
-        color: #fff !important;
-        padding: 12px 28px;
-        border-radius: 8px;
-        font-size: 1.08rem;
-        font-weight: 600;
-        text-decoration: none;
-        z-index: 999;
-        transition: background 0.18s, color 0.18s;
-        box-shadow: 0 2px 8px rgba(220,53,69,0.08);
-    ">Đăng xuất</a>
+    <a href="{% url 'logout' %}" class="logout-link-fixed">Đăng xuất</a>
     <div class="main-content">
         <div class="container">
             <h1>Trang quản trị nhà hàng buffet</h1>

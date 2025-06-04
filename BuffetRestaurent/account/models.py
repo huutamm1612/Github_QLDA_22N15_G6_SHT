@@ -24,3 +24,37 @@ class MonAn(models.Model):
 
     def __str__(self):
         return self.TenMonAn
+
+class KhuBanAn(models.Model):
+    TenKhu = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.TenKhu
+
+class BanAn(models.Model):
+    SoBan = models.CharField(max_length=20)  # Số bàn hoặc mã bàn
+    TrangThai = models.BooleanField(default=True)  # True: Trống, False: Đã có người
+    Khu = models.ForeignKey(KhuBanAn, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Bàn {self.SoBan} - {self.Khu.TenKhu}"
+
+class HoaDon(models.Model):
+    Ban = models.ForeignKey(BanAn, on_delete=models.CASCADE)
+    time = models.DateTimeField(auto_now_add=True)
+    timeout = models.DateTimeField(null=True, blank=True)
+    SoLuongNguoi = models.PositiveIntegerField(default=1)
+    TongTien = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    TrangThai = models.BooleanField(default=False)  # False: chưa thanh toán, True: đã thanh toán
+
+    def __str__(self):
+        return f"Hóa đơn bàn {self.Ban.SoBan} - {'Đã thanh toán' if self.TrangThai else 'Chưa thanh toán'}"
+
+class ChiTietHoaDon(models.Model):
+    HoaDon = models.ForeignKey(HoaDon, on_delete=models.CASCADE, related_name='chi_tiet')
+    MonAn = models.ForeignKey(MonAn, on_delete=models.CASCADE)
+    SoLuong = models.PositiveIntegerField(default=1)
+    GhiChu = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.HoaDon} - {self.MonAn} x {self.SoLuong}"

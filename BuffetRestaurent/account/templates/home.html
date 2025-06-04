@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang quản trị nhà hàng buffet</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 500px; margin: 80px auto; background: #fff; padding: 40px 40px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); text-align: center; }
+        h1 { margin-bottom: 32px; color: #007bff; }
+        .btn-group { margin-top: 32px; }
+        a.button {
+            display: inline-block;
+            margin: 0 16px;
+            padding: 16px 32px;
+            background: #007bff;
+            color: #fff;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        a.button:hover { background: #0056b3; }
+        .btn-group a.button.special {
+            background: #ffc107;
+            color: #222;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Trang quản trị nhà hàng buffet</h1>
+        <div class="btn-group">
+            <a href="{% url 'danh_sach_mon_an' %}" class="button">Quản lý món ăn</a>
+            <a href="{% url 'danh_sach_ban_an' %}" class="button">Quản lý khu & bàn ăn</a>
+            <a href="{% url 'mo_ban' %}" class="button special">Mở bàn</a>
+            <a href="{% url 'bieu_do_doanh_thu' %}" class="button" style="background:#28a745;">Xem tình trạng kinh doanh</a>
+        </div>
+        <div style="margin-top: 40px;">
+            <a href="{% url 'logout' %}" style="color: #dc3545; font-size: 18px; text-decoration: underline;">Đăng xuất</a>
+        </div>
+    </div>
+</body>
+</html>

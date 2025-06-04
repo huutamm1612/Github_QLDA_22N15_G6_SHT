@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý bàn ăn</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h2 { margin-top: 32px; color: #007bff; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+        th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
+        th { background: #f0f0f0; }
+        .status-true { color: green; font-weight: bold; }
+        .status-false { color: red; font-weight: bold; }
+        .action-btn { margin-right: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quản lý bàn ăn theo khu vực</h1>
+        <div style="margin-bottom: 24px;">
+            <a href="{% url 'home' %}" style="padding: 8px 16px; background: #6c757d; color: #fff; border-radius: 4px; text-decoration: none; margin-right: 10px;">Về trang chủ</a>
+            <a href="{% url 'them_ban_an' %}" style="padding: 8px 16px; background: #28a745; color: #fff; border-radius: 4px; text-decoration: none; margin-right: 10px;">+ Thêm bàn ăn</a>
+            <a href="{% url 'them_khu' %}" style="padding: 8px 16px; background: #17a2b8; color: #fff; border-radius: 4px; text-decoration: none;">+ Thêm khu vực</a>
+        </div>
+        {% for group in data %}
+            <h2>{{ group.khu.TenKhu }}
+                <a href="{% url 'sua_khu' group.khu.id %}" class="action-btn" style="background:#007bff;color:#fff;padding:4px 10px;border-radius:4px;text-decoration:none;margin-left:8px;">Sửa</a>
+                <form action="{% url 'xoa_khu' group.khu.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa khu này?');" style="background:#dc3545;color:#fff;border:none;padding:4px 10px;border-radius:4px;">Xóa</button>
+                </form>
+            </h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Số bàn</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for ban in group.banan_list %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ ban.SoBan }}</td>
+                        <td class="status-{{ ban.TrangThai|yesno:'true,false' }}">{% if ban.TrangThai %}Trống{% else %}Đã có người{% endif %}</td>
+                        <td>
+                            <a href="{% url 'sua_ban_an' ban.id %}" class="action-btn" style="background:#007bff;color:#fff;padding:4px 10px;border-radius:4px;text-decoration:none;">Sửa</a>
+                            <form action="{% url 'xoa_ban_an' ban.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa bàn này?');" style="background:#dc3545;color:#fff;border:none;padding:4px 10px;border-radius:4px;">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4">Không có bàn nào.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    </div>
+</body>
+</html>

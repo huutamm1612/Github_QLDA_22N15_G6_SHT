@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Mở bàn</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); display: flex; }
+        .khu-list { width: 220px; border-right: 1px solid #eee; padding-right: 24px; }
+        .khu-list h2 { font-size: 20px; margin-bottom: 16px; }
+        .khu-item { margin-bottom: 12px; }
+        .khu-link { display: block; padding: 10px 16px; border-radius: 6px; background: #f0f0f0; color: #222; text-decoration: none; font-weight: bold; }
+        .khu-link.selected, .khu-link:hover { background: #007bff; color: #fff; }
+        .banan-list { flex: 1; padding-left: 32px; }
+        .banan-list h2 { font-size: 20px; margin-bottom: 16px; }
+        .banan-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+        .ban-item { width: 100px; height: 100px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; cursor: pointer; border: 2px solid #ccc; background: #fff; transition: background 0.2s, border 0.2s; position: relative; }
+        .ban-item.trong { background: #fff; border: 2px solid #28a745; color: #222; }
+        .ban-item.da-co-nguoi { background: #ffe066; border: 2px solid #ffc107; color: #222; }
+        .ban-item.selected { box-shadow: 0 0 0 3px #007bff; }
+        .form-mo-ban { margin-top: 32px; background: #f8f9fa; padding: 24px 32px; border-radius: 8px; max-width: 350px; }
+        .form-mo-ban label { display: block; margin-bottom: 8px; }
+        .form-mo-ban input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 16px; }
+        .form-mo-ban button { padding: 10px 20px; border: none; border-radius: 4px; font-size: 16px; margin-right: 10px; }
+        .form-mo-ban .mo-ban-btn { background: #28a745; color: #fff; }
+        .form-mo-ban .quay-lai-btn { background: #6c757d; color: #fff; }
+    </style>
+    <script>
+        function selectBan(banId) {
+            document.getElementById('ban_id').value = banId;
+            document.getElementById('form-mo-ban').style.display = 'block';
+        }
+        function quayLai() {
+            document.getElementById('form-mo-ban').style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="khu-list">
+            <h2>Danh sách khu</h2>
+            {% for khu in all_khu %}
+                <div class="khu-item">
+                    <a href="?khu={{ khu.id }}" class="khu-link{% if selected_khu and khu.id == selected_khu.id %} selected{% endif %}">{{ khu.TenKhu }}</a>
+                </div>
+            {% endfor %}
+            <div style="margin-top: 32px;">
+                <a href="{% url 'home' %}" style="display:block;padding:10px 0;background:#6c757d;color:#fff;text-align:center;border-radius:6px;text-decoration:none;">&larr; Về trang chủ</a>
+            </div>
+        </div>
+        <div class="banan-list">
+            {% if success_message %}
+                <div style="background:#e6ffe6;border:1px solid #28a745;padding:18px 24px;border-radius:8px;margin-bottom:24px;text-align:center;">
+                    <h2 style="color:#28a745;">{{ success_message }}</h2>
+                    {% if qr_code_base64 and goi_mon_url %}
+                        <div style="margin:24px auto;">
+                            <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="QR gọi món" style="display:block;margin:auto;width:220px;height:220px;border:8px solid #fff;box-shadow:0 2px 8px #ccc;border-radius:16px;">
+                        </div>
+                        <div style="text-align:center;margin-bottom:12px;">
+                            <a href="{{ goi_mon_url }}" target="_blank" style="font-size:18px;color:#007bff;word-break:break-all;">{{ goi_mon_url }}</a>
+                        </div>
+                        <div style="text-align:center;color:#888;font-size:15px;">Quét mã QR hoặc truy cập link trên để khách gọi món cho bàn <b>{{ opened_ban.SoBan }}</b>.</div>
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% if error %}
+                <div style="background:#fff3cd;border:1px solid #ffc107;padding:14px 20px;border-radius:8px;margin-bottom:18px;color:#856404;">{{ error }}</div>
+            {% endif %}
+            {% if selected_khu %}
+                <h2>Bàn ăn khu {{ selected_khu.TenKhu }}</h2>
+                <div class="banan-grid">
+                    {% for ban in banan_list %}
+                        <div class="ban-item {% if ban.TrangThai %}trong{% else %}da-co-nguoi{% endif %}"
+                             onclick="if({{ ban.TrangThai|yesno:'true,false' }})selectBan({{ ban.id }}); else showHoaDon({{ ban.id }}, '{{ ban.SoBan }}');">
+                            {{ ban.SoBan }}
+                        </div>
+                    {% empty %}
+                        <div>Không có bàn nào trong khu này.</div>
+                    {% endfor %}
+                </div>
+                <form id="form-mo-ban" class="form-mo-ban" method="post" style="display:none; margin-top:32px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="ban_id" id="ban_id">
+                    <label for="so_nguoi">Số lượng người:</label>
+                    <input type="number" name="so_nguoi" id="so_nguoi" min="1" required>
+                    <div>
+                        <button type="submit" class="mo-ban-btn">Mở bàn</button>
+                        <button type="button" class="quay-lai-btn" onclick="quayLai()">Quay lại</button>
+                    </div>
+                </form>
+                <!-- Modal hiển thị hóa đơn -->
+                <div id="modal-hoa-don" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.3);z-index:1000;align-items:center;justify-content:center;">
+                  <div style="background:#fff;padding:32px 36px;border-radius:12px;max-width:480px;width:90vw;box-shadow:0 2px 16px #888;position:relative;">
+                    <h2 style="margin-bottom:18px;">Hóa đơn bàn <span id="modal-so-ban"></span></h2>
+                    <div id="modal-hoa-don-content">Đang tải...</div>
+                    <div style="margin-top:24px;text-align:right;">
+                      <button onclick="closeModalHoaDon()" style="padding:8px 18px;background:#6c757d;color:#fff;border:none;border-radius:5px;font-size:16px;margin-right:10px;">Quay lại</button>
+                      <button id="btn-thanh-toan" onclick="thanhToanBan()" style="padding:8px 18px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;">Thanh toán</button>
+                    </div>
+                  </div>
+                </div>
+                <script>
+                function showHoaDon(banId, soBan) {
+                  document.getElementById('modal-so-ban').innerText = soBan;
+                  document.getElementById('modal-hoa-don-content').innerHTML = 'Đang tải...';
+                  document.getElementById('modal-hoa-don').style.display = 'flex';
+                  fetch(`/user/hoa-don/${banId}/?ajax=1`)
+                    .then(res => res.json())
+                    .then(data => {
+                      if(data.success) {
+                        let html = '<table style="width:100%;margin-bottom:12px;">';
+                        html += '<tr><th style="text-align:left;">Món</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:right;">Tổng</th></tr>';
+                        data.items.forEach(item => {
+                          html += `<tr><td>${item.ten}</td><td style='text-align:right;'>${item.soluong}</td><td style='text-align:right;'>${item.dongia}</td><td style='text-align:right;'>${item.thanhtien}</td></tr>`;
+                        });
+                        html += `</table><div style='font-weight:bold;text-align:right;'>Tổng tiền: <span style='color:#e74c3c;font-size:18px;'>${data.tong_tien}</span></div>`;
+                        document.getElementById('modal-hoa-don-content').innerHTML = html;
+                        document.getElementById('btn-thanh-toan').onclick = function() { thanhToanBan(banId); };
+                      } else {
+                        document.getElementById('modal-hoa-don-content').innerHTML = data.message || 'Không có hóa đơn.';
+                        document.getElementById('btn-thanh-toan').style.display = 'none';
+                      }
+                    });
+                }
+                function closeModalHoaDon() {
+                  document.getElementById('modal-hoa-don').style.display = 'none';
+                  document.getElementById('btn-thanh-toan').style.display = '';
+                }
+                function thanhToanBan(banId) {
+                  fetch(`/user/hoa-don/${banId}/?thanh_toan=1`, {method:'POST',headers:{'X-CSRFToken':'{{ csrf_token }}'}})
+                    .then(res => res.json())
+                    .then(data => {
+                      if(data.success) {
+                        document.getElementById('modal-hoa-don-content').innerHTML = '<div style="color:#28a745;font-weight:bold;font-size:18px;">Đã thanh toán thành công!</div>';
+                        setTimeout(()=>{ location.reload(); }, 1200);
+                      } else {
+                        alert(data.message || 'Có lỗi khi thanh toán!');
+                      }
+                    });
+                }
+                </script>
+            {% else %}
+                <h2>Chọn khu để xem bàn ăn</h2>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

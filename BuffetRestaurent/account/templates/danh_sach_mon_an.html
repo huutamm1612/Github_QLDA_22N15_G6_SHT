@@ -19,10 +19,22 @@
     <div class="container">
         <h1>Danh sách món ăn theo loại</h1>
         <div style="margin-bottom: 24px;">
+            <a href="{% url 'home' %}" style="padding: 8px 16px; background: #6c757d; color: #fff; border-radius: 4px; text-decoration: none; margin-right: 10px;">Về trang chủ</a>
             <a href="{% url 'them_monan' %}" style="padding: 8px 16px; background: #28a745; color: #fff; border-radius: 4px; text-decoration: none; margin-right: 10px;">+ Thêm món ăn</a>
             <a href="{% url 'them_loaimonan' %}" style="padding: 8px 16px; background: #17a2b8; color: #fff; border-radius: 4px; text-decoration: none;">+ Thêm loại món ăn</a>
         </div>
+        <form method="get" class="filter-form" style="margin-bottom: 24px;">
+            <label for="loai">Chọn loại món ăn:</label>
+            <select name="loai" id="loai" onchange="this.form.submit()">
+                <option value="">Tất cả</option>
+                {% for loai in all_loai_monan %}
+                    <option value="{{ loai.id }}" {% if loai.id|stringformat:'s' == selected_loai %}selected{% endif %}>{{ loai.TenLoaiMon }}</option>
+                {% endfor %}
+            </select>
+            <noscript><button type="submit">Lọc</button></noscript>
+        </form>
         {% for group in data %}
+            {% if not selected_loai or group.loai.id|stringformat:'s' == selected_loai %}
             <h2>{{ group.loai.TenLoaiMon }}</h2>
             <table>
                 <thead>
@@ -62,6 +74,7 @@
                 {% endfor %}
                 </tbody>
             </table>
+            {% endif %}
         {% endfor %}
     </div>
 </body>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Gọi món - Bàn {{ ban.SoBan }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 1100px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); display: flex; }
+        .khu-list { width: 220px; border-right: 1px solid #eee; padding-right: 24px; }
+        .khu-item { margin-bottom: 16px; }
+        .khu-link { display: block; padding: 10px 16px; background: #f8f9fa; border-radius: 4px; color: #333; text-decoration: none; }
+        .khu-link:hover, .khu-link.selected { background: #007bff; color: #fff; }
+        .banan-list { flex: 1; padding-left: 32px; }
+        h1 { color: #007bff; margin-bottom: 24px; }
+        .loai-block { margin-bottom: 32px; }
+        .loai-title { font-size: 20px; color: #333; margin-bottom: 12px; }
+        .monan-list { display: flex; flex-wrap: wrap; gap: 18px; }
+        .monan-item { background: #f8f9fa; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 16px; width: 220px; text-align: center; }
+        .monan-item img { max-width: 120px; max-height: 80px; border-radius: 6px; margin-bottom: 8px; }
+        .monan-item .ten { font-weight: bold; margin-bottom: 6px; }
+        .monan-item .gia { color: #28a745; font-weight: bold; margin-bottom: 8px; }
+        .monan-item input[type='number'] { width: 60px; padding: 4px; border-radius: 4px; border: 1px solid #ccc; }
+        .monan-item button { margin-top: 8px; padding: 6px 16px; background: #007bff; color: #fff; border: none; border-radius: 4px; font-size: 15px; }
+        .monan-item button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="khu-list">
+            <button onclick="showHoaDonModal()" style="display:block;width:100%;padding:12px 0;background:#ffc107;color:#222;text-align:center;border-radius:6px;text-decoration:none;font-weight:bold;margin-bottom:18px;border:none;cursor:pointer;font-size:16px;">Xem hóa đơn</button>
+            <h2>Loại món ăn</h2>
+            {% for group in data %}
+                <div class="khu-item">
+                    <a href="?loai={{ group.loai.id }}" class="khu-link{% if group.loai.id|stringformat:'s' == selected_loai %} selected{% endif %}">{{ group.loai.TenLoaiMon }}</a>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="banan-list">
+            <h1>Gọi món cho bàn {{ ban.SoBan }}</h1>
+            {% for group in data %}
+                {% if not selected_loai or group.loai.id|stringformat:'s' == selected_loai %}
+                <div class="loai-block">
+                    <div class="loai-title">{{ group.loai.TenLoaiMon }}</div>
+                    <div class="monan-list">
+                        {% for monan in group.monan_list %}
+                            <div class="monan-item">
+                                <img src="{{ monan.Anh }}" alt="Ảnh món ăn">
+                                <div class="ten">{{ monan.TenMonAn }}</div>
+                                <div class="gia">{{ monan.DonGia }} VNĐ</div>
+                                <form method="post" action="">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="monan_id" value="{{ monan.id }}">
+                                    <label>Số lượng:</label>
+                                    <input type="number" name="so_luong" min="1" value="1" required>
+                                    <button type="submit">Gọi món</button>
+                                </form>
+                            </div>
+                        {% empty %}
+                            <div>Không có món ăn nào.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Modal hóa đơn -->
+    <div id="modal-hoa-don" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);z-index:1000;align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:32px 36px;border-radius:12px;max-width:480px;width:90vw;box-shadow:0 2px 16px #888;position:relative;">
+        <h2 style="margin-bottom:18px;">Hóa đơn bàn {{ ban.SoBan }}</h2>
+        <div id="modal-hoa-don-content">Đang tải...</div>
+        <div style="margin-top:24px;text-align:right;">
+          <button onclick="closeModalHoaDon()" style="padding:8px 18px;background:#6c757d;color:#fff;border:none;border-radius:5px;font-size:16px;">Đóng</button>
+        </div>
+      </div>
+    </div>
+    <script>
+    function showHoaDonModal() {
+      document.getElementById('modal-hoa-don').style.display = 'flex';
+      fetch('/user/hoa-don/{{ ban.id }}/?ajax=1')
+        .then(res => res.json())
+        .then(data => {
+          if(data.success) {
+            let html = '<table style="width:100%;margin-bottom:12px;">';
+            html += '<tr><th style="text-align:left;">Món</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:right;">Tổng</th></tr>';
+            data.items.forEach(item => {
+              html += `<tr><td>${item.ten}</td><td style='text-align:right;'>${item.soluong}</td><td style='text-align:right;'>${item.dongia}</td><td style='text-align:right;'>${item.thanhtien}</td></tr>`;
+            });
+            html += `</table><div style='font-weight:bold;text-align:right;'>Tổng tiền: <span style='color:#e74c3c;font-size:18px;'>${data.tong_tien}</span></div>`;
+            document.getElementById('modal-hoa-don-content').innerHTML = html;
+          } else {
+            document.getElementById('modal-hoa-don-content').innerHTML = data.message || 'Không có hóa đơn.';
+          }
+        });
+    }
+    function closeModalHoaDon() {
+      document.getElementById('modal-hoa-don').style.display = 'none';
+    }
+    </script>
+</body>
+</html>

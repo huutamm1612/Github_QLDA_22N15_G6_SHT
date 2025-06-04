@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết hóa đơn - Bàn {{ ban.SoBan }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); }
+        h1 { color: #007bff; margin-bottom: 24px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
+        th { background: #f0f0f0; }
+        .tong-tien { font-size: 20px; color: #28a745; font-weight: bold; text-align: right; }
+        .back-btn { display: inline-block; padding: 8px 18px; background: #6c757d; color: #fff; border-radius: 4px; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chi tiết hóa đơn - Bàn {{ ban.SoBan }}</h1>
+        {% if hoadon and chitiet_list %}
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tên món ăn</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ct in chitiet_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ ct.MonAn.TenMonAn }}</td>
+                    <td>{{ ct.SoLuong }}</td>
+                    <td>{{ ct.MonAn.DonGia }} VNĐ</td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="tong-tien">Tổng tiền: {{ tong_tien }} VNĐ</div>
+        {% else %}
+        <div>Chưa có món nào được gọi.</div>
+        {% endif %}
+        <a href="{% url 'goi_mon' ban.id %}" class="back-btn">&larr; Quay lại gọi món</a>
+    </div>
+</body>
+</html>

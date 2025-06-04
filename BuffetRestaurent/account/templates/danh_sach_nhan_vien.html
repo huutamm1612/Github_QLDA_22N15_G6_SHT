@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách nhân viên</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); }
+        h1 { color: #007bff; text-align: center; margin-bottom: 32px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+        th, td { border: 1px solid #ccc; padding: 10px 14px; text-align: left; }
+        th { background: #f0f0f0; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .back-link { display: block; margin: 0 auto; text-align: center; color: #007bff; text-decoration: underline; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Danh sách nhân viên</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã NV</th>
+                    <th>Tên nhân viên</th>
+                    <th>Số điện thoại</th>
+                    <th>Chức vụ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nv in nhan_vien_list %}
+                <tr>
+                    <td>{{ nv.id }}</td>
+                    <td>{{ nv.ten_nhan_vien }}</td>
+                    <td>{{ nv.so_dien_thoai }}</td>
+                    <td>{{ nv.chuc_vu }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" style="text-align:center;">Chưa có nhân viên nào.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'home' %}" class="back-link">&larr; Về trang chủ</a>
+    </div>
+</body>
+</html>

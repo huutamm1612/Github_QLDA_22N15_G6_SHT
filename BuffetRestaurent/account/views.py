@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Account, MonAn, LoaiMonAn, KhuBanAn, BanAn, HoaDon
+from .models import Account, MonAn, LoaiMonAn, KhuBanAn, BanAn, HoaDon, NhanVien
 from django import forms
 from django.conf import settings
 import os
@@ -266,3 +266,7 @@ def bieu_do_doanh_thu_view(request):
     labels = [str(dt['ngay']) for dt in doanh_thu_ngay]
     data = [float(dt['tong']) for dt in doanh_thu_ngay]
     return render(request, 'bieu_do_doanh_thu.html', {'labels': labels, 'data': data})
+
+def danh_sach_nhan_vien_view(request):
+    nhan_vien_list = NhanVien.objects.all().order_by('id')
+    return render(request, 'danh_sach_nhan_vien.html', {'nhan_vien_list': nhan_vien_list})

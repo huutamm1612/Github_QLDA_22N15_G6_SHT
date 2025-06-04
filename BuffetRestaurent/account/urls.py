@@ -21,5 +21,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('mo-ban/', views.mo_ban_view, name='mo_ban'),
     path('bieu-do-doanh-thu/', views.bieu_do_doanh_thu_view, name='bieu_do_doanh_thu'),
+    path('nhan-vien/', views.danh_sach_nhan_vien_view, name='danh_sach_nhan_vien'),
 ]
 

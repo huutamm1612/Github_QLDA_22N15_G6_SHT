@@ -58,3 +58,11 @@ class ChiTietHoaDon(models.Model):
 
     def __str__(self):
         return f"{self.HoaDon} - {self.MonAn} x {self.SoLuong}"
+
+class NhanVien(models.Model):
+    ten_nhan_vien = models.CharField(max_length=100)
+    so_dien_thoai = models.CharField(max_length=20)
+    chuc_vu = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.ten_nhan_vien} ({self.chuc_vu})"

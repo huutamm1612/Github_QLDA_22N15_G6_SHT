@@ -4,26 +4,130 @@
     <meta charset="UTF-8">
     <title>Mở bàn</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); display: flex; }
-        .khu-list { width: 220px; border-right: 1px solid #eee; padding-right: 24px; }
-        .khu-list h2 { font-size: 20px; margin-bottom: 16px; }
-        .khu-item { margin-bottom: 12px; }
-        .khu-link { display: block; padding: 10px 16px; border-radius: 6px; background: #f0f0f0; color: #222; text-decoration: none; font-weight: bold; }
-        .khu-link.selected, .khu-link:hover { background: #007bff; color: #fff; }
-        .banan-list { flex: 1; padding-left: 32px; }
-        .banan-list h2 { font-size: 20px; margin-bottom: 16px; }
-        .banan-grid { display: flex; flex-wrap: wrap; gap: 16px; }
-        .ban-item { width: 100px; height: 100px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; cursor: pointer; border: 2px solid #ccc; background: #fff; transition: background 0.2s, border 0.2s; position: relative; }
-        .ban-item.trong { background: #fff; border: 2px solid #28a745; color: #222; }
-        .ban-item.da-co-nguoi { background: #ffe066; border: 2px solid #ffc107; color: #222; }
-        .ban-item.selected { box-shadow: 0 0 0 3px #007bff; }
-        .form-mo-ban { margin-top: 32px; background: #f8f9fa; padding: 24px 32px; border-radius: 8px; max-width: 350px; }
-        .form-mo-ban label { display: block; margin-bottom: 8px; }
-        .form-mo-ban input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 16px; }
-        .form-mo-ban button { padding: 10px 20px; border: none; border-radius: 4px; font-size: 16px; margin-right: 10px; }
-        .form-mo-ban .mo-ban-btn { background: #28a745; color: #fff; }
-        .form-mo-ban .quay-lai-btn { background: #6c757d; color: #fff; }
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(120deg, #f5f7fa 0%, #e3f0ff 100%);
+    margin: 0;
+}
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 38px 48px;
+    border-radius: 18px;
+    box-shadow: 0 6px 32px rgba(33,150,243,0.10);
+    display: flex;
+}
+.khu-list {
+    width: 230px;
+    border-right: 1.5px solid #e3f2fd;
+    padding-right: 28px;
+}
+.khu-list h2 {
+    font-size: 1.25rem;
+    margin-bottom: 18px;
+    color: #2196f3;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+.khu-item { margin-bottom: 14px; }
+.khu-link {
+    display: block;
+    padding: 12px 18px;
+    border-radius: 8px;
+    background: #f0f4fa;
+    color: #223366;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.18s, color 0.18s;
+    box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+}
+.khu-link.selected, .khu-link:hover {
+    background: linear-gradient(90deg,#43e97b 0,#38f9d7 100%);
+    color: #fff;
+    box-shadow: 0 2px 12px rgba(33,150,243,0.10);
+}
+.banan-list { flex: 1; padding-left: 40px; }
+.banan-list h2 {
+    font-size: 1.2rem;
+    margin-bottom: 18px;
+    color: #007bff;
+    font-weight: bold;
+}
+.banan-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-bottom: 24px;
+}
+.ban-item {
+    width: 110px; height: 110px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; font-weight: bold;
+    cursor: pointer;
+    border: 2.5px solid #b3c6e0;
+    background: #f8fafc;
+    transition: background 0.18s, border 0.18s, box-shadow 0.18s;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(33,150,243,0.06);
+}
+.ban-item.trong {
+    background: #fff;
+    border: 2.5px solid #28a745;
+    color: #222;
+}
+.ban-item.da-co-nguoi {
+    background: #ffe066;
+    border: 2.5px solid #ffc107;
+    color: #222;
+}
+.ban-item.selected {
+    box-shadow: 0 0 0 4px #2196f3;
+}
+.form-mo-ban {
+    margin-top: 32px;
+    background: #f8f9fa;
+    padding: 28px 36px;
+    border-radius: 12px;
+    max-width: 370px;
+    box-shadow: 0 2px 12px rgba(33,150,243,0.07);
+}
+.form-mo-ban label { display: block; margin-bottom: 10px; font-weight: 500; color: #1976d2; }
+.form-mo-ban input {
+    width: 100%;
+    padding: 10px;
+    border: 1.5px solid #90caf9;
+    border-radius: 6px;
+    margin-bottom: 18px;
+    font-size: 1.08rem;
+    background: #e3f2fd;
+}
+.form-mo-ban button {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.08rem;
+    margin-right: 12px;
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(33,150,243,0.07);
+    transition: background 0.18s, color 0.18s;
+}
+.form-mo-ban .mo-ban-btn { background: #28a745; color: #fff; }
+.form-mo-ban .mo-ban-btn:hover { background: #218838; }
+.form-mo-ban .quay-lai-btn { background: #6c757d; color: #fff; }
+.form-mo-ban .quay-lai-btn:hover { background: #495057; }
+@media (max-width: 900px) {
+    .container { flex-direction: column; padding: 10px 2px; }
+    .khu-list { width: 100%; border-right: none; border-bottom: 1.5px solid #e3f2fd; padding-right: 0; padding-bottom: 18px; margin-bottom: 18px; }
+    .banan-list { padding-left: 0; }
+    .banan-grid { gap: 10px; }
+    .ban-item { width: 90px; height: 90px; font-size: 1.1rem; }
+}
+@media (max-width: 600px) {
+    .container { padding: 2px; }
+    .form-mo-ban { padding: 12px 6px; }
+}
     </style>
     <script>
         function selectBan(banId) {

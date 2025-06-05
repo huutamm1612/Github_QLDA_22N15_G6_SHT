@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>MANWAH | Taiwanese Hotpot - Trang chủ</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; margin: 0; }
+        .navbar {
+            background: #fff;
+            color: #222;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            height: 64px;
+            box-shadow: 0 2px 8px rgba(34,51,102,0.08);
+        }
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 40px;
+            letter-spacing: 1px;
+            color: #d32f2f;
+            display: flex;
+            align-items: center;
+        }
+        .navbar .logo img {
+            height: 38px;
+            margin-right: 10px;
+        }
+        .navbar a {
+            color: #222;
+            text-decoration: none;
+            margin-right: 32px;
+            font-size: 1.08rem;
+            font-weight: 500;
+            transition: color 0.18s, background 0.18s;
+            padding: 8px 18px;
+            border-radius: 22px;
+        }
+        .navbar a.active, .navbar a:hover {
+            background: #ffedd2;
+            color: #d32f2f;
+        }
+        .banner {
+            width: 100%;
+            margin: 0 auto;
+            margin-top: 18px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            max-width: 1100px;
+        }
+        .banner img { width: 100%; display: block; }
+        .section { max-width: 1100px; margin: 36px auto 0; }
+        .section-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 18px; color: #222; }
+        .discount-tabs { display: flex; gap: 18px; margin-bottom: 18px; }
+        .discount-tab { padding: 8px 22px; border-radius: 22px; background: #f5f5f5; color: #222; font-weight: 500; cursor: pointer; border: none; font-size: 1rem; }
+        .discount-tab.active, .discount-tab:hover { background: #ffedd2; color: #d32f2f; }
+        .discount-list { display: flex; gap: 24px; }
+        .discount-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px #eee;
+            overflow: hidden;
+            width: 320px;
+            position: relative;
+        }
+        .discount-card img { width: 100%; height: 160px; object-fit: cover; }
+        .discount-card .discount-label {
+            position: absolute; top: 12px; right: 12px;
+            background: #222; color: #fff; font-size: 1rem; font-weight: bold;
+            padding: 4px 14px; border-radius: 16px;
+        }
+        .discount-card .discount-label.orange { background: #d32f2f; }
+        .discount-card .discount-label.green { background: #388e3c; }
+        .discount-card .discount-label.blue { background: #1976d2; }
+        .discount-card .card-title {
+            font-size: 1.1rem; font-weight: 600; margin: 12px 0 6px 0; color: #222; padding: 0 16px;
+        }
+        .discount-card .card-desc { color: #666; font-size: 0.98rem; padding: 0 16px 12px 16px; }
+        .menu-list { display: flex; gap: 18px; margin-top: 18px; }
+        .menu-card {
+            background: #111; color: #fff;
+            border-radius: 12px;
+            width: 160px;
+            text-align: center;
+            padding: 18px 0 12px 0;
+            box-shadow: 0 2px 8px #eee;
+        }
+        .menu-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; margin-bottom: 10px; }
+        .menu-card .menu-title { font-weight: 600; font-size: 1.08rem; margin-bottom: 4px; }
+        .menu-card .menu-count { color: #ffc107; font-size: 0.98rem; }
+        @media (max-width: 1200px) {
+            .banner, .section { max-width: 98vw; }
+        }
+        @media (max-width: 900px) {
+            .discount-list, .menu-list { flex-direction: column; gap: 18px; }
+            .discount-card, .menu-card { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo"><img src="/media/home/homepic1.png" alt="logo">MANWAH</div>
+        <a href="/user/" class="active">Home</a>
+        <a href="/user/uu-dai/">Ưu đãi</a>
+        <a href="/user/thuc-don/">Thực đơn</a>
+        <a href="/user/dat-ban/">Đặt bàn</a>
+    </div>
+    <div class="banner">
+        <img src="/media/home/homepic1.png" alt="Banner">
+    </div>
+    <div class="section">
+        <div class="section-title">Giảm giá -40% 🎉 cho khách hàng</div>
+        <div class="discount-tabs">
+            <button class="discount-tab active">Lẩu</button>
+            <button class="discount-tab">Hải sản</button>
+            <button class="discount-tab">Bò</button>
+            <button class="discount-tab">Những món khác</button>
+        </div>
+        <div class="discount-list">
+            <div class="discount-card">
+                <img src="/media/home/homepic1.png" alt="Lẩu Đài Loan">
+                <div class="discount-label orange">-40%</div>
+                <div class="card-title">Lẩu Đài Loan</div>
+                <div class="card-desc">Thưởng thức lẩu Đài Loan chuẩn vị với ưu đãi cực sốc.</div>
+            </div>
+            <div class="discount-card">
+                <img src="/media/home/homepic1.png" alt="Manwah Lê Thái Tổ">
+                <div class="discount-label green">-20%</div>
+                <div class="card-title">MANWAH LÊ THÁI TỔ</div>
+                <div class="card-desc">Ưu đãi đặc biệt cho khách đặt bàn online tại cơ sở Lê Thái Tổ.</div>
+            </div>
+            <div class="discount-card">
+                <img src="/media/home/homepic1.png" alt="Butter Vincom">
+                <div class="discount-label blue">-17%</div>
+                <div class="card-title">Butter Vincom</div>
+                <div class="card-desc">Combo buffet bò Mỹ, hải sản tươi ngon, giá cực tốt.</div>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <div class="section-title">Đặt những món ăn phổ biến 🥢</div>
+        <div class="menu-list">
+            <div class="menu-card">
+                <img src="/media/home/homepic1.png" alt="Hải sản">
+                <div class="menu-title">Hải sản</div>
+                <div class="menu-count">6 món</div>
+            </div>
+            <div class="menu-card">
+                <img src="/media/home/homepic1.png" alt="Mỳ">
+                <div class="menu-title">Mỳ</div>
+                <div class="menu-count">6 món</div>
+            </div>
+            <div class="menu-card">
+                <img src="/media/home/homepic1.png" alt="Thịt Heo">
+                <div class="menu-title">Thịt Heo</div>
+                <div class="menu-count">6 món</div>
+            </div>
+            <div class="menu-card">
+                <img src="/media/home/homepic1.png" alt="Đậu hũ">
+                <div class="menu-title">Đậu hũ</div>
+                <div class="menu-count">6 món</div>
+            </div>
+            <div class="menu-card">
+                <img src="/media/home/homepic1.png" alt="Nội tạng">
+                <div class="menu-title">Nội tạng</div>
+                <div class="menu-count">6 món</div>
+            </div>
+            <div class="menu-card">
+                <img src="/media/home/homepic1.png" alt="Thịt bò">
+                <div class="menu-title">Thịt bò</div>
+                <div class="menu-count">5 món</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

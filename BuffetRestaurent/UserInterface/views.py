@@ -1,6 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from account.models import BanAn, MonAn, LoaiMonAn, HoaDon, ChiTietHoaDon
 from django.http import HttpResponseForbidden, JsonResponse
+from .models import ChiNhanh, DatBan
+from datetime import datetime
+from django.utils import timezone
 
 def goi_mon_view(request, ban_id):
     ban = get_object_or_404(BanAn, id=ban_id)
@@ -78,3 +81,58 @@ def xem_hoa_don_view(request, ban_id):
             
     context = {'ban': ban, 'hoadon': hoadon, 'chitiet_list': hoadon.chi_tiet.all(), 'tong_tien': tong_tien}
     return render(request, 'xem_hoa_don.html', context)
+
+def home_user_view(request):
+    return render(request, 'home_user.html')
+
+def uu_dai_view(request):
+    return render(request, 'uu_dai.html')
+
+def thuc_don_view(request):
+    selected_loai = request.GET.get('loai')
+    loai_monan_list = LoaiMonAn.objects.all().order_by('TenLoaiMon')
+    if not selected_loai:
+        bo_loai = LoaiMonAn.objects.filter(TenLoaiMon__icontains='bò').first()
+        if bo_loai:
+            selected_loai = bo_loai.id
+        else:
+            selected_loai = None
+    if selected_loai:
+        monan_list = MonAn.objects.filter(IdLoaiMonAn_id=selected_loai, TrangThai=True)
+        try:
+            selected_loai = int(selected_loai)
+        except:
+            selected_loai = None
+    else:
+        monan_list = MonAn.objects.filter(TrangThai=True)
+        selected_loai = None
+    context = {
+        'loai_monan_list': loai_monan_list,
+        'monan_list': monan_list,
+        'selected_loai': selected_loai,
+        'active_tab': 'thuc_don',
+    }
+    return render(request, 'thuc_don.html', context)
+
+def dat_ban_view(request):
+    if request.method == 'POST':
+        ten_khach_hang = request.POST.get('ten_khach_hang')
+        so_dien_thoai = request.POST.get('so_dien_thoai')
+        thoi_gian = request.POST.get('thoi_gian')
+        chi_nhanh_id = request.POST.get('chi_nhanh_id')
+        try:
+            chi_nhanh = ChiNhanh.objects.get(id=chi_nhanh_id)
+            thoi_gian_dt = datetime.strptime(thoi_gian, "%Y-%m-%dT%H:%M")
+            thoi_gian_aware = timezone.make_aware(thoi_gian_dt, timezone.get_current_timezone())
+            DatBan.objects.create(
+                ten_khach_hang=ten_khach_hang,
+                so_dien_thoai=so_dien_thoai,
+                thoi_gian=thoi_gian_aware,
+                chi_nhanh=chi_nhanh,
+                trang_thai='chua_den',
+            )
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+    branches = ChiNhanh.objects.all()
+    return render(request, 'dat_ban.html', {'branches': branches})

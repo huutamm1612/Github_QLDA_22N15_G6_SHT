@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý chi nhánh</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; margin: 0; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); }
+        h1 { color: #d32f2f; margin-bottom: 32px; }
+        .top-actions { margin-bottom: 18px; }
+        .top-actions a { padding: 8px 16px; border-radius: 6px; text-decoration: none; margin-right: 10px; font-weight: 500; font-size: 1rem; transition: background 0.18s, color 0.18s; background: #28a745; color: #fff; }
+        .top-actions a:hover { background: #218838; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background: #fff3e0; color: #d32f2f; font-size: 1.05rem; }
+        tr:last-child td { border-bottom: none; }
+        .action-btn { padding: 6px 16px; border-radius: 6px; border: none; font-size: 1rem; cursor: pointer; margin-right: 6px; }
+        .edit-btn { background: #ffc107; color: #222; }
+        .delete-btn { background: #e57373; color: #fff; }
+        .add-btn { background: #28a745; color: #fff; padding: 10px 22px; border-radius: 8px; text-decoration: none; font-weight: 600; float: right; margin-bottom: 18px; }
+        .back-link { display: inline-block; margin-top: 24px; color: #007bff; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quản lý chi nhánh</h1>
+        <div class="top-actions">
+            <a href="{% url 'them_chi_nhanh' %}" class="add-btn">+ Thêm chi nhánh</a>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tên chi nhánh</th>
+                    <th>Địa chỉ</th>
+                    <th>SĐT</th>
+                    <th>Giờ mở</th>
+                    <th>Giờ đóng</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cn in chi_nhanh_list %}
+                <tr>
+                    <td>{{ cn.ten_chi_nhanh }}</td>
+                    <td>{{ cn.dia_chi }}</td>
+                    <td>{{ cn.so_dien_thoai }}</td>
+                    <td>{{ cn.gio_mo|time:'H:i' }}</td>
+                    <td>{{ cn.gio_dong|time:'H:i' }}</td>
+                    <td>
+                        <a href="{% url 'sua_chi_nhanh' cn.id %}" class="action-btn edit-btn">Sửa</a>
+                        <form action="{% url 'xoa_chi_nhanh' cn.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="action-btn delete-btn" onclick="return confirm('Bạn chắc chắn muốn xóa chi nhánh này?');">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="text-align:center;color:#888;">Chưa có chi nhánh nào.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'home' %}" class="back-link">&larr; Về trang chủ</a>
+    </div>
+</body>
+</html>

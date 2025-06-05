@@ -10,6 +10,7 @@ import base64
 from django.db.models import Sum
 from django.db.models.functions import TruncDate
 from django.views.decorators.http import require_POST
+from django.utils import timezone
 
 class MonAnForm(forms.ModelForm):
     class Meta:
@@ -58,6 +59,18 @@ class BanAnForm(forms.ModelForm):
             'SoBan': 'Số bàn',
             'TrangThai': 'Trạng thái (Trống/Đã có người)',
             'Khu': 'Khu vực',
+        }
+
+class ChiNhanhForm(forms.ModelForm):
+    class Meta:
+        model = ChiNhanh
+        fields = ['ten_chi_nhanh', 'dia_chi', 'so_dien_thoai', 'gio_mo', 'gio_dong']
+        labels = {
+            'ten_chi_nhanh': 'Tên chi nhánh',
+            'dia_chi': 'Địa chỉ',
+            'so_dien_thoai': 'Số điện thoại',
+            'gio_mo': 'Giờ mở cửa',
+            'gio_dong': 'Giờ đóng cửa',
         }
 
 def login_view(request):
@@ -288,6 +301,8 @@ def danh_sach_nhan_vien_view(request):
 def danh_sach_dat_ban_view(request):
     chi_nhanh_list = ChiNhanh.objects.all()
     chi_nhanh_id = request.GET.get('chi_nhanh')
+    filter_time = request.GET.get('time', '')
+    filter_status = request.GET.get('status', '')
     selected_chi_nhanh = None
     datban_qs = DatBan.objects.select_related('chi_nhanh').order_by('-thoi_gian')
     if chi_nhanh_id:
@@ -296,10 +311,25 @@ def danh_sach_dat_ban_view(request):
             datban_qs = datban_qs.filter(chi_nhanh=selected_chi_nhanh)
         except ChiNhanh.DoesNotExist:
             selected_chi_nhanh = None
+    # Lọc theo thời gian
+    now = timezone.localtime(timezone.now())
+    if filter_time == 'today':
+        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+        datban_qs = datban_qs.filter(thoi_gian__range=(start, end))
+    elif filter_time == 'future':
+        datban_qs = datban_qs.filter(thoi_gian__gte=now)
+    # Lọc theo trạng thái
+    if filter_status == 'da_den':
+        datban_qs = datban_qs.filter(trang_thai='da_den')
+    elif filter_status == 'chua_den':
+        datban_qs = datban_qs.filter(trang_thai='chua_den')
     return render(request, 'danh_sach_dat_ban.html', {
         'datban_list': datban_qs,
         'chi_nhanh_list': chi_nhanh_list,
         'selected_chi_nhanh': selected_chi_nhanh,
+        'filter_time': filter_time,
+        'filter_status': filter_status,
     })
 
 @require_POST
@@ -317,3 +347,35 @@ def huy_dat_ban_view(request, datban_id):
         datban.trang_thai = 'da_huy'
         datban.save(update_fields=['trang_thai'])
     return redirect('danh_sach_dat_ban')
+
+def danh_sach_chi_nhanh_view(request):
+    chi_nhanh_list = ChiNhanh.objects.all().order_by('id')
+    return render(request, 'danh_sach_chi_nhanh.html', {'chi_nhanh_list': chi_nhanh_list})
+
+def them_chi_nhanh_view(request):
+    if request.method == 'POST':
+        form = ChiNhanhForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('danh_sach_chi_nhanh')
+    else:
+        form = ChiNhanhForm()
+    return render(request, 'them_chi_nhanh.html', {'form': form})
+
+def sua_chi_nhanh_view(request, cn_id):
+    cn = get_object_or_404(ChiNhanh, id=cn_id)
+    if request.method == 'POST':
+        form = ChiNhanhForm(request.POST, instance=cn)
+        if form.is_valid():
+            form.save()
+            return redirect('danh_sach_chi_nhanh')
+    else:
+        form = ChiNhanhForm(instance=cn)
+    return render(request, 'them_chi_nhanh.html', {'form': form, 'is_update': True, 'chi_nhanh': cn})
+
+def xoa_chi_nhanh_view(request, cn_id):
+    cn = get_object_or_404(ChiNhanh, id=cn_id)
+    if request.method == 'POST':
+        cn.delete()
+        return redirect('danh_sach_chi_nhanh')
+    return redirect('danh_sach_chi_nhanh')

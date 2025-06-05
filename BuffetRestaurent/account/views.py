@@ -138,11 +138,23 @@ def sua_monan_view(request, monan_id):
 
 def danh_sach_ban_an_view(request):
     khu_list = KhuBanAn.objects.all().order_by('TenKhu')
+    selected_khu_id = request.GET.get('khu')
+    selected_khu = None
     data = []
-    for khu in khu_list:
-        banan = BanAn.objects.filter(Khu=khu).order_by('SoBan')
-        data.append({'khu': khu, 'banan_list': banan})
-    return render(request, 'danh_sach_ban_an.html', {'data': data, 'all_khu': khu_list})
+    if selected_khu_id:
+        try:
+            selected_khu = KhuBanAn.objects.get(id=selected_khu_id)
+            banan = BanAn.objects.filter(Khu=selected_khu).order_by('SoBan')
+            data.append({'khu': selected_khu, 'banan_list': banan})
+        except KhuBanAn.DoesNotExist:
+            for khu in khu_list:
+                banan = BanAn.objects.filter(Khu=khu).order_by('SoBan')
+                data.append({'khu': khu, 'banan_list': banan})
+    else:
+        for khu in khu_list:
+            banan = BanAn.objects.filter(Khu=khu).order_by('SoBan')
+            data.append({'khu': khu, 'banan_list': banan})
+    return render(request, 'danh_sach_ban_an.html', {'data': data, 'all_khu': khu_list, 'selected_khu': selected_khu})
 
 def them_khu_view(request):
     if request.method == 'POST':

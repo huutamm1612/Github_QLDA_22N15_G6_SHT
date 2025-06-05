@@ -4,62 +4,155 @@
     <meta charset="UTF-8">
     <title>Quản lý bàn ăn</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        h2 { margin-top: 32px; color: #007bff; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
-        th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
-        th { background: #f0f0f0; }
-        .status-true { color: green; font-weight: bold; }
-        .status-false { color: red; font-weight: bold; }
-        .action-btn { margin-right: 4px; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; display: flex; }
+        .sidebar {
+            width: 220px;
+            min-height: 100vh;
+            background: #223366;
+            padding: 40px 0 0 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            box-shadow: 2px 0 18px 0 rgba(34,51,102,0.06);
+        }
+        .sidebar .khu-btn {
+            width: 90%;
+            margin: 0 0 14px 0;
+            padding: 12px 20px;
+            border-radius: 8px 0 0 8px;
+            background: #223366;
+            color: #fff;
+            text-align: left;
+            font-size: 1.05rem;
+            font-weight: 500;
+            text-decoration: none;
+            border: none;
+            transition: background 0.18s, color 0.18s;
+            cursor: pointer;
+            outline: none;
+        }
+        .sidebar .khu-btn.active, .sidebar .khu-btn:hover {
+            background: #ffc107;
+            color: #223366;
+        }
+        .main-content {
+            flex: 1;
+            padding: 40px 0 40px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 950px; width: 100%; background: #fff; padding: 32px 40px; border-radius: 16px; box-shadow: 0 6px 32px rgba(0,0,0,0.10); }
+        h1 { color: #222; margin-bottom: 28px; font-size: 2.1rem; text-align: center; }
+        h2 { margin-top: 32px; color: #007bff; font-size: 1.25rem; display: flex; align-items: center; gap: 10px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 32px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+        th, td { padding: 12px 16px; text-align: left; font-size: 1.04rem; }
+        th { background: #f0f0f0; color: #222; font-weight: 700; border-bottom: 2px solid #e9ecef; }
+        tr { transition: background 0.15s; }
+        tr:hover { background: #f8f9fa; }
+        td { border-bottom: 1px solid #e9ecef; }
+        tr:last-child td { border-bottom: none; }
+        .status-true { color: #28a745; font-weight: bold; }
+        .status-false { color: #dc3545; font-weight: bold; }
+        .action-btn, .action-btn:visited {
+            display: inline-block;
+            padding: 7px 16px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            margin-right: 4px;
+            border: none;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+            cursor: pointer;
+        }
+        .action-btn.edit { background: #007bff; color: #fff; }
+        .action-btn.edit:hover { background: #0056b3; }
+        .action-btn.delete { background: #dc3545; color: #fff; }
+        .action-btn.delete:hover { background: #a71d2a; }
+        .top-actions { margin-bottom: 24px; }
+        .top-actions a { padding: 8px 16px; border-radius: 6px; text-decoration: none; margin-right: 10px; font-weight: 500; font-size: 1rem; transition: background 0.18s, color 0.18s; }
+        .top-actions a.home { background: #6c757d; color: #fff; }
+        .top-actions a.add-ban { background: #28a745; color: #fff; }
+        .top-actions a.add-ban:hover { background: #218838; }
+        .top-actions a.add-khu { background: #17a2b8; color: #fff; }
+        .top-actions a.add-khu:hover { background: #117a8b; }
+        @media (max-width: 700px) {
+            .container { padding: 10px 2px; }
+            th, td { font-size: 0.97rem; padding: 7px 4px; }
+            .top-actions a { padding: 7px 8px; font-size: 0.95rem; }
+        }
+        @media (max-width: 900px) {
+            .container { padding: 10px 2px; }
+            .sidebar { width: 80px; padding: 20px 0 0 0; }
+            .sidebar .khu-btn { font-size: 0.95rem; padding: 10px 6px; width: 95%; }
+        }
+        @media (max-width: 600px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100vw; flex-direction: row; align-items: stretch; padding: 0; min-height: unset; box-shadow: none; }
+            .sidebar .khu-btn { width: 100%; border-radius: 0; margin: 0; padding: 10px 4px; text-align: center; }
+            .main-content { padding: 0; }
+            .container { margin: 0; border-radius: 0; box-shadow: none; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Quản lý bàn ăn theo khu vực</h1>
-        <div style="margin-bottom: 24px;">
-            <a href="{% url 'home' %}" style="padding: 8px 16px; background: #6c757d; color: #fff; border-radius: 4px; text-decoration: none; margin-right: 10px;">Về trang chủ</a>
-            <a href="{% url 'them_ban_an' %}" style="padding: 8px 16px; background: #28a745; color: #fff; border-radius: 4px; text-decoration: none; margin-right: 10px;">+ Thêm bàn ăn</a>
-            <a href="{% url 'them_khu' %}" style="padding: 8px 16px; background: #17a2b8; color: #fff; border-radius: 4px; text-decoration: none;">+ Thêm khu vực</a>
+    <div class="sidebar">
+        <form method="get" style="width:100%;">
+            <button type="submit" name="khu" value="" class="khu-btn {% if not selected_khu %}active{% endif %}">Tất cả</button>
+            {% for khu in all_khu %}
+                <button type="submit" name="khu" value="{{ khu.id }}" class="khu-btn {% if selected_khu and khu.id == selected_khu.id %}active{% endif %}">{{ khu.TenKhu }}</button>
+            {% endfor %}
+        </form>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <h1>Quản lý bàn ăn theo khu vực</h1>
+            <div class="top-actions">
+                <a href="{% url 'home' %}" class="action-btn home">Về trang chủ</a>
+                <a href="{% url 'them_ban_an' %}" class="action-btn add-ban">+ Thêm bàn ăn</a>
+                <a href="{% url 'them_khu' %}" class="action-btn add-khu">+ Thêm khu vực</a>
+            </div>
+            {% for group in data %}
+                {% if not selected_khu or group.khu.id == selected_khu.id %}
+                <h2>{{ group.khu.TenKhu }}
+                    <a href="{% url 'sua_khu' group.khu.id %}" class="action-btn edit">Sửa</a>
+                    <form action="{% url 'xoa_khu' group.khu.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="action-btn delete" onclick="return confirm('Bạn có chắc muốn xóa khu này?');">Xóa</button>
+                    </form>
+                </h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Số bàn</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for ban in group.banan_list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ ban.SoBan }}</td>
+                            <td class="status-{{ ban.TrangThai|yesno:'true,false' }}">{% if ban.TrangThai %}Trống{% else %}Đã có người{% endif %}</td>
+                            <td>
+                                <a href="{% url 'sua_ban_an' ban.id %}" class="action-btn edit">Sửa</a>
+                                <form action="{% url 'xoa_ban_an' ban.id %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="action-btn delete" onclick="return confirm('Bạn có chắc muốn xóa bàn này?');">Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4">Không có bàn nào.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            {% endfor %}
         </div>
-        {% for group in data %}
-            <h2>{{ group.khu.TenKhu }}
-                <a href="{% url 'sua_khu' group.khu.id %}" class="action-btn" style="background:#007bff;color:#fff;padding:4px 10px;border-radius:4px;text-decoration:none;margin-left:8px;">Sửa</a>
-                <form action="{% url 'xoa_khu' group.khu.id %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa khu này?');" style="background:#dc3545;color:#fff;border:none;padding:4px 10px;border-radius:4px;">Xóa</button>
-                </form>
-            </h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Số bàn</th>
-                        <th>Trạng thái</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for ban in group.banan_list %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ ban.SoBan }}</td>
-                        <td class="status-{{ ban.TrangThai|yesno:'true,false' }}">{% if ban.TrangThai %}Trống{% else %}Đã có người{% endif %}</td>
-                        <td>
-                            <a href="{% url 'sua_ban_an' ban.id %}" class="action-btn" style="background:#007bff;color:#fff;padding:4px 10px;border-radius:4px;text-decoration:none;">Sửa</a>
-                            <form action="{% url 'xoa_ban_an' ban.id %}" method="post" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa bàn này?');" style="background:#dc3545;color:#fff;border:none;padding:4px 10px;border-radius:4px;">Xóa</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr><td colspan="4">Không có bàn nào.</td></tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% endfor %}
     </div>
 </body>
 </html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý đặt bàn</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; margin: 0; }
+        .container { max-width: 1100px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); }
+        h1 { color: #d32f2f; margin-bottom: 32px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background: #fff3e0; color: #d32f2f; font-size: 1.05rem; }
+        tr:last-child td { border-bottom: none; }
+        .action-btn { padding: 6px 16px; border-radius: 6px; border: none; font-size: 1rem; cursor: pointer; margin-right: 6px; }
+        .edit-btn { background: #ffc107; color: #222; }
+        .delete-btn { background: #e57373; color: #fff; }
+        .add-btn { background: #28a745; color: #fff; padding: 10px 22px; border-radius: 8px; text-decoration: none; font-weight: 600; float: right; margin-bottom: 18px; }
+        .status-chua_den { color: #ff9800; font-weight: bold; }
+        .status-da_den { color: #388e3c; font-weight: bold; }
+        .status-da_huy { color: #d32f2f; font-weight: bold; }
+        .back-link { display: inline-block; margin-top: 24px; color: #007bff; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quản lý đặt bàn</h1>
+        <form method="get" style="margin-bottom:18px;">
+            <label for="filter_chi_nhanh">Lọc theo chi nhánh:</label>
+            <select name="chi_nhanh" id="filter_chi_nhanh" onchange="this.form.submit()" style="padding:6px 12px;border-radius:6px;border:1px solid #ccc;">
+                <option value="">Tất cả</option>
+                {% for cn in chi_nhanh_list %}
+                    <option value="{{ cn.id }}" {% if selected_chi_nhanh and cn.id == selected_chi_nhanh.id %}selected{% endif %}>{{ cn.ten_chi_nhanh }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Khách hàng</th>
+                    <th>SĐT</th>
+                    <th>Chi nhánh</th>
+                    <th>Thời gian</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for datban in datban_list %}
+                <tr>
+                    <td>{{ datban.ten_khach_hang }}</td>
+                    <td>{{ datban.so_dien_thoai }}</td>
+                    <td>{{ datban.chi_nhanh.ten_chi_nhanh }}</td>
+                    <td>{{ datban.thoi_gian|date:'d/m/Y H:i' }}</td>
+                    <td class="status-{{ datban.trang_thai }}">{{ datban.get_trang_thai_display }}</td>
+                    <td>
+                        <form action="{% url 'xac_nhan_dat_ban' datban.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="action-btn add-btn" onclick="return confirm('Xác nhận khách đã đến?');">Đã đến</button>
+                        </form>
+                        <form action="{% url 'huy_dat_ban' datban.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="action-btn delete-btn" onclick="return confirm('Bạn chắc chắn muốn hủy đặt bàn này?');">Hủy</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="text-align:center;color:#888;">Chưa có đặt bàn nào.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'home' %}" class="back-link">&larr; Về trang chủ</a>
+    </div>
+</body>
+</html>

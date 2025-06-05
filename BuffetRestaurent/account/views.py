@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Account, MonAn, LoaiMonAn, KhuBanAn, BanAn, HoaDon, NhanVien
+from UserInterface.models import DatBan, ChiNhanh
 from django import forms
 from django.conf import settings
 import os
@@ -8,6 +9,7 @@ import io
 import base64
 from django.db.models import Sum
 from django.db.models.functions import TruncDate
+from django.views.decorators.http import require_POST
 
 class MonAnForm(forms.ModelForm):
     class Meta:
@@ -282,3 +284,36 @@ def bieu_do_doanh_thu_view(request):
 def danh_sach_nhan_vien_view(request):
     nhan_vien_list = NhanVien.objects.all().order_by('id')
     return render(request, 'danh_sach_nhan_vien.html', {'nhan_vien_list': nhan_vien_list})
+
+def danh_sach_dat_ban_view(request):
+    chi_nhanh_list = ChiNhanh.objects.all()
+    chi_nhanh_id = request.GET.get('chi_nhanh')
+    selected_chi_nhanh = None
+    datban_qs = DatBan.objects.select_related('chi_nhanh').order_by('-thoi_gian')
+    if chi_nhanh_id:
+        try:
+            selected_chi_nhanh = ChiNhanh.objects.get(id=chi_nhanh_id)
+            datban_qs = datban_qs.filter(chi_nhanh=selected_chi_nhanh)
+        except ChiNhanh.DoesNotExist:
+            selected_chi_nhanh = None
+    return render(request, 'danh_sach_dat_ban.html', {
+        'datban_list': datban_qs,
+        'chi_nhanh_list': chi_nhanh_list,
+        'selected_chi_nhanh': selected_chi_nhanh,
+    })
+
+@require_POST
+def xac_nhan_dat_ban_view(request, datban_id):
+    datban = get_object_or_404(DatBan, id=datban_id)
+    if datban.trang_thai != 'da_den':
+        datban.trang_thai = 'da_den'
+        datban.save(update_fields=['trang_thai'])
+    return redirect('danh_sach_dat_ban')
+
+@require_POST
+def huy_dat_ban_view(request, datban_id):
+    datban = get_object_or_404(DatBan, id=datban_id)
+    if datban.trang_thai != 'da_huy':
+        datban.trang_thai = 'da_huy'
+        datban.save(update_fields=['trang_thai'])
+    return redirect('danh_sach_dat_ban')

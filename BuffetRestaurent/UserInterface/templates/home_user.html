@@ -27,19 +27,21 @@
             height: 38px;
             margin-right: 10px;
         }
-        .navbar a { 
+        .navbar a, .navbar a:visited {
             color: #222;
-            text-decoration: none;
+            text-decoration: none !important;
             margin-right: 32px;
             font-size: 1.08rem;
             font-weight: 500;
             transition: color 0.18s, background 0.18s;
             padding: 8px 18px;
             border-radius: 22px;
+            outline: none;
         }
         .navbar a.active, .navbar a:hover {
             background: #ffedd2;
             color: #d32f2f;
+            text-decoration: none !important;
         }
         .banner {
             width: 100%;
@@ -54,8 +56,8 @@
         .section { max-width: 1100px; margin: 36px auto 0; }
         .section-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 18px; color: #222; }
         .discount-tabs { display: flex; gap: 18px; margin-bottom: 18px; }
-        .discount-tab { padding: 8px 22px; border-radius: 22px; background: #f5f5f5; color: #222; font-weight: 500; cursor: pointer; border: none; font-size: 1rem; }
-        .discount-tab.active, .discount-tab:hover { background: #ffedd2; color: #d32f2f; }
+        .discount-tab { padding: 8px 22px; border-radius: 22px; background: #f5f5f5; color: #222; font-weight: 500; cursor: pointer; border: none; font-size: 1rem; text-decoration: none !important; }
+        .discount-tab.active, .discount-tab:hover { background: #ffedd2; color: #d32f2f; text-decoration: none !important; }
         .discount-list { display: flex; gap: 24px; }
         .discount-card {
             background: #fff;
@@ -88,8 +90,19 @@
             box-shadow: 0 2px 8px #eee;
         }
         .menu-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; margin-bottom: 10px; }
-        .menu-card .menu-title { font-weight: 600; font-size: 1.08rem; margin-bottom: 4px; }
+        .menu-card .menu-title, .menu-card .menu-title:visited, .menu-card .menu-title:hover {
+            font-weight: 600; font-size: 1.08rem; margin-bottom: 4px; text-decoration: none !important; color: #fff;
+        }
         .menu-card .menu-count { color: #ffc107; font-size: 0.98rem; }
+        .menu-card a, .menu-card a:visited {
+            color: inherit;
+            text-decoration: none !important;
+            display: block;
+        }
+        .menu-card a:hover {
+            opacity: 0.92;
+            text-decoration: none !important;
+        }
         @media (max-width: 1300px) {
             .banner, .section { max-width: 100vw; }
         }

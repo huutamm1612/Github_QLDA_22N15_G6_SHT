@@ -177,11 +177,11 @@
 <body>
     <div class="sidebar">
         <div class="btn-group">
+            <a href="{% url 'mo_ban' %}" class="button special">Mở bàn</a>
             <a href="{% url 'danh_sach_mon_an' %}" class="button">Quản lý món ăn</a>
             <a href="{% url 'danh_sach_ban_an' %}" class="button">Quản lý khu & bàn ăn</a>
-            <a href="{% url 'mo_ban' %}" class="button special">Mở bàn</a>
-            <a href="{% url 'bieu_do_doanh_thu' %}" class="button" style="background:#28a745;">Xem tình trạng kinh doanh</a>
-            <a href="{% url 'danh_sach_nhan_vien' %}" class="button" style="background:#17a2b8;">Quản lý nhân viên</a>
+            <a href="{% url 'bieu_do_doanh_thu' %}" class="button">Xem tình trạng kinh doanh</a>
+            <a href="{% url 'danh_sach_nhan_vien' %}" class="button">Quản lý nhân viên</a>
         </div>
     </div>
     <a href="{% url 'logout' %}" class="logout-link-fixed">Đăng xuất</a>

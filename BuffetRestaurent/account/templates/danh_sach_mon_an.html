@@ -4,78 +4,197 @@
     <meta charset="UTF-8">
     <title>Danh sách món ăn</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; display: flex; }
+        .sidebar {
+            width: 220px;
+            min-height: 100vh;
+            background: #223366;
+            padding: 40px 0 0 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            box-shadow: 2px 0 18px 0 rgba(34,51,102,0.06);
+        }
+        .sidebar .category-btn {
+            width: 90%;
+            margin: 0 0 14px 0;
+            padding: 12px 20px;
+            border-radius: 8px 0 0 8px;
+            background: #223366;
+            color: #fff;
+            text-align: left;
+            font-size: 1.05rem;
+            font-weight: 500;
+            text-decoration: none;
+            border: none;
+            transition: background 0.18s, color 0.18s;
+            cursor: pointer;
+            outline: none;
+        }
+        .sidebar .category-btn.active, .sidebar .category-btn:hover {
+            background: #ffc107;
+            color: #223366;
+        }
+        .main-content {
+            flex: 1;
+            padding: 40px 0 40px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 1100px; width: 100%; background: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         h2 { margin-top: 32px; color: #007bff; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
-        th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
-        th { background: #f0f0f0; }
-        img { max-width: 80px; max-height: 60px; }
-        .status-true { color: green; font-weight: bold; }
-        .status-false { color: red; font-weight: bold; }
+        h1 {
+            text-align: center;
+            color: #007bff;
+            font-size: 2.3rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 32px;
+            margin-top: 0;
+            text-shadow: 0 2px 12px rgba(0,123,255,0.08), 0 1px 0 #fff;
+        }
+        .dish-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 32px 24px;
+            margin-bottom: 32px;
+        }
+        .dish-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 18px 18px 20px 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: box-shadow 0.18s;
+        }
+        .dish-card:hover {
+            box-shadow: 0 6px 24px rgba(0,123,255,0.13);
+        }
+        .dish-card img {
+            width: 180px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            background: #f5f5f5;
+        }
+        .dish-name {
+            font-size: 1.13rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .dish-price {
+            font-size: 1.08rem;
+            color: #007bff;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .dish-status {
+            font-size: 1.01rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .dish-status.true { color: #28a745; }
+        .dish-status.false { color: #dc3545; }
+        .dish-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .dish-actions form, .dish-actions a {
+            display: inline-block;
+        }
+        .dish-actions button, .dish-actions a {
+            border: none;
+            outline: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.98rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            margin: 0;
+        }
+        .dish-actions .update-btn { background: #ffc107; color: #222; }
+        .dish-actions .update-btn:hover { background: #e0a800; }
+        .dish-actions .edit-btn { background: #007bff; color: #fff; }
+        .dish-actions .edit-btn:hover { background: #0056b3; }
+        .dish-actions .delete-btn { background: #dc3545; color: #fff; }
+        .dish-actions .delete-btn:hover { background: #a71d2a; }
+        .top-actions { margin-bottom: 24px; }
+        .top-actions a { padding: 8px 16px; border-radius: 4px; text-decoration: none; margin-right: 10px; }
+        .top-actions a.home { background: #6c757d; color: #fff; }
+        .top-actions a.add-monan { background: #28a745; color: #fff; }
+        .top-actions a.add-loai { background: #17a2b8; color: #fff; }
+        @media (max-width: 900px) {
+            .container { padding: 16px 4px; }
+            .sidebar { width: 80px; padding: 20px 0 0 0; }
+            .sidebar .category-btn { font-size: 0.95rem; padding: 10px 6px; width: 95%; }
+            .dish-card img { width: 120px; height: 90px; }
+        }
+        @media (max-width: 600px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100vw; flex-direction: row; align-items: stretch; padding: 0; min-height: unset; box-shadow: none; }
+            .sidebar .category-btn { width: 100%; border-radius: 0; margin: 0; padding: 10px 4px; text-align: center; }
+            .main-content { padding: 0; }
+            .container { margin: 0; border-radius: 0; box-shadow: none; }
+            .dish-card img { width: 100%; height: 120px; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Danh sách món ăn theo loại</h1>
-        <div style="margin-bottom: 24px;">
-            <a href="{% url 'home' %}" style="padding: 8px 16px; background: #6c757d; color: #fff; border-radius: 4px; text-decoration: none; margin-right: 10px;">Về trang chủ</a>
-            <a href="{% url 'them_monan' %}" style="padding: 8px 16px; background: #28a745; color: #fff; border-radius: 4px; text-decoration: none; margin-right: 10px;">+ Thêm món ăn</a>
-            <a href="{% url 'them_loaimonan' %}" style="padding: 8px 16px; background: #17a2b8; color: #fff; border-radius: 4px; text-decoration: none;">+ Thêm loại món ăn</a>
-        </div>
-        <form method="get" class="filter-form" style="margin-bottom: 24px;">
-            <label for="loai">Chọn loại món ăn:</label>
-            <select name="loai" id="loai" onchange="this.form.submit()">
-                <option value="">Tất cả</option>
-                {% for loai in all_loai_monan %}
-                    <option value="{{ loai.id }}" {% if loai.id|stringformat:'s' == selected_loai %}selected{% endif %}>{{ loai.TenLoaiMon }}</option>
-                {% endfor %}
-            </select>
-            <noscript><button type="submit">Lọc</button></noscript>
+    <div class="sidebar">
+        <form method="get" style="width:100%;">
+            <button type="submit" name="loai" value="" class="category-btn {% if not selected_loai %}active{% endif %}">Tất cả</button>
+            {% for loai in all_loai_monan %}
+                <button type="submit" name="loai" value="{{ loai.id }}" class="category-btn {% if loai.id|stringformat:'s' == selected_loai %}active{% endif %}">{{ loai.TenLoaiMon }}</button>
+            {% endfor %}
         </form>
-        {% for group in data %}
-            {% if not selected_loai or group.loai.id|stringformat:'s' == selected_loai %}
-            <h2>{{ group.loai.TenLoaiMon }}</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Tên món ăn</th>
-                        <th>Ảnh</th>
-                        <th>Đơn giá</th>
-                        <th>Trạng thái</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <h1>Danh sách món ăn theo loại</h1>
+            <div class="top-actions">
+                <a href="{% url 'home' %}" class="home">Về trang chủ</a>
+                <a href="{% url 'them_monan' %}" class="add-monan">+ Thêm món ăn</a>
+                <a href="{% url 'them_loaimonan' %}" class="add-loai">+ Thêm loại món ăn</a>
+            </div>
+            {% for group in data %}
+                {% if not selected_loai or group.loai.id|stringformat:'s' == selected_loai %}
+                <h2>{{ group.loai.TenLoaiMon }}</h2>
+                <div class="dish-grid">
                 {% for monan in group.monan_list %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ monan.TenMonAn }}</td>
-                        <td><img src="{{ monan.Anh }}" alt="Ảnh món ăn"></td>
-                        <td>{{ monan.DonGia }} VNĐ</td>
-                        <td class="status-{{ monan.TrangThai|yesno:'true,false' }}">
+                    <div class="dish-card">
+                        <img src="{{ monan.Anh }}" alt="Ảnh món ăn">
+                        <div class="dish-name">{{ monan.TenMonAn }}</div>
+                        <div class="dish-price">{{ monan.DonGia|floatformat:0 }} VNĐ</div>
+                        <div class="dish-status {% if monan.TrangThai %}true{% else %}false{% endif %}">
                             {% if monan.TrangThai %}Còn{% else %}Hết{% endif %}
-                        </td>
-                        <td>
+                        </div>
+                        <div class="dish-actions">
                             <form action="{% url 'capnhat_trangthai_monan' monan.id %}" method="post" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" style="background:#ffc107;color:#222;border:none;padding:5px 10px;border-radius:4px;">Cập nhật trạng thái</button>
+                                <button type="submit" class="update-btn">Cập nhật trạng thái</button>
                             </form>
-                            <a href="{% url 'sua_monan' monan.id %}" style="background:#007bff;color:#fff;padding:5px 10px;border-radius:4px;text-decoration:none;margin-left:4px;">Sửa</a>
-                            <form action="{% url 'xoa_monan' monan.id %}" method="post" style="display:inline;margin-left:4px;">
+                            <a href="{% url 'sua_monan' monan.id %}" class="edit-btn">Sửa</a>
+                            <form action="{% url 'xoa_monan' monan.id %}" method="post" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa món ăn này?');" style="background:#dc3545;color:#fff;border:none;padding:5px 10px;border-radius:4px;">Xóa</button>
+                                <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa món ăn này?');" class="delete-btn">Xóa</button>
                             </form>
-                        </td>
-                    </tr>
+                        </div>
+                    </div>
                 {% empty %}
-                    <tr><td colspan="6">Không có món ăn nào.</td></tr>
+                    <div>Không có món ăn nào.</div>
                 {% endfor %}
-                </tbody>
-            </table>
-            {% endif %}
-        {% endfor %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
 </body>
 </html>

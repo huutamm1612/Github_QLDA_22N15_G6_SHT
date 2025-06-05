@@ -24,13 +24,25 @@
 <body>
     <div class="container">
         <h1>Quản lý đặt bàn</h1>
-        <form method="get" style="margin-bottom:18px;">
-            <label for="filter_chi_nhanh">Lọc theo chi nhánh:</label>
+        <form method="get" style="margin-bottom:18px;display:flex;gap:18px;align-items:center;">
+            <label for="filter_chi_nhanh">Lọc chi nhánh:</label>
             <select name="chi_nhanh" id="filter_chi_nhanh" onchange="this.form.submit()" style="padding:6px 12px;border-radius:6px;border:1px solid #ccc;">
                 <option value="">Tất cả</option>
                 {% for cn in chi_nhanh_list %}
                     <option value="{{ cn.id }}" {% if selected_chi_nhanh and cn.id == selected_chi_nhanh.id %}selected{% endif %}>{{ cn.ten_chi_nhanh }}</option>
                 {% endfor %}
+            </select>
+            <label for="filter_time">Thời gian:</label>
+            <select name="time" id="filter_time" onchange="this.form.submit()" style="padding:6px 12px;border-radius:6px;border:1px solid #ccc;">
+                <option value="">Tất cả</option>
+                <option value="today" {% if filter_time == 'today' %}selected{% endif %}>Hôm nay</option>
+                <option value="future" {% if filter_time == 'future' %}selected{% endif %}>Từ nay về sau</option>
+            </select>
+            <label for="filter_status">Trạng thái:</label>
+            <select name="status" id="filter_status" onchange="this.form.submit()" style="padding:6px 12px;border-radius:6px;border:1px solid #ccc;">
+                <option value="">Tất cả</option>
+                <option value="da_den" {% if filter_status == 'da_den' %}selected{% endif %}>Đã đến</option>
+                <option value="chua_den" {% if filter_status == 'chua_den' %}selected{% endif %}>Chưa đến</option>
             </select>
         </form>
         <table>

@@ -25,5 +25,9 @@ urlpatterns = [
     path('dat-ban/', views.danh_sach_dat_ban_view, name='danh_sach_dat_ban'),
     path('dat-ban/xac-nhan/<int:datban_id>/', views.xac_nhan_dat_ban_view, name='xac_nhan_dat_ban'),
     path('dat-ban/huy/<int:datban_id>/', views.huy_dat_ban_view, name='huy_dat_ban'),
+    path('chi-nhanh/', views.danh_sach_chi_nhanh_view, name='danh_sach_chi_nhanh'),
+    path('chi-nhanh/them/', views.them_chi_nhanh_view, name='them_chi_nhanh'),
+    path('chi-nhanh/sua/<int:cn_id>/', views.sua_chi_nhanh_view, name='sua_chi_nhanh'),
+    path('chi-nhanh/xoa/<int:cn_id>/', views.xoa_chi_nhanh_view, name='xoa_chi_nhanh'),
 ]
 

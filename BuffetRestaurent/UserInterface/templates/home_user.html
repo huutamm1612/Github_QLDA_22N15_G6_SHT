@@ -27,7 +27,7 @@
             height: 38px;
             margin-right: 10px;
         }
-        .navbar a {
+        .navbar a { 
             color: #222;
             text-decoration: none;
             margin-right: 32px;
@@ -90,18 +90,18 @@
         .menu-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; margin-bottom: 10px; }
         .menu-card .menu-title { font-weight: 600; font-size: 1.08rem; margin-bottom: 4px; }
         .menu-card .menu-count { color: #ffc107; font-size: 0.98rem; }
-        @media (max-width: 1200px) {
-            .banner, .section { max-width: 98vw; }
+        @media (max-width: 1300px) {
+            .banner, .section { max-width: 100vw; }
         }
         @media (max-width: 900px) {
-            .discount-list, .menu-list { flex-direction: column; gap: 18px; }
+            .discount-list, .menu-list { flex-direction: column; gap: 20px; }
             .discount-card, .menu-card { width: 100%; }
         }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <div class="logo"><img src="/media/home/homepic1.png" alt="logo">MANWAH</div>
+        <div class="logo"><img src="/media/home/logo.png" alt="logo"></div>
         <a href="/user/" class="active">Home</a>
         <a href="/user/uu-dai/">Ưu đãi</a>
         <a href="/user/thuc-don/">Thực đơn</a>
@@ -112,27 +112,21 @@
     </div>
     <div class="section">
         <div class="section-title">Giảm giá -40% 🎉 cho khách hàng</div>
-        {% comment %} <div class="discount-tabs">
-            <button class="discount-tab active">Lẩu</button>
-            <button class="discount-tab">Hải sản</button>
-            <button class="discount-tab">Bò</button>
-            <button class="discount-tab">Những món khác</button>
-        </div> {% endcomment %}
         <div class="discount-list">
             <div class="discount-card">
-                <img src="/media/home/homepic1.png" alt="Lẩu Đài Loan">
+                <img src="/media/home/image2.png" alt="Lẩu Đài Loan">
                 <div class="discount-label orange">-40%</div>
                 <div class="card-title">Lẩu Đài Loan</div>
                 <div class="card-desc">Thưởng thức lẩu Đài Loan chuẩn vị với ưu đãi cực sốc.</div>
             </div>
             <div class="discount-card">
-                <img src="/media/home/homepic1.png" alt="Manwah Lê Thái Tổ">
+                <img src="/media/home/image3.png" alt="Manwah Lê Thái Tổ">
                 <div class="discount-label green">-20%</div>
                 <div class="card-title">MANWAH LÊ THÁI TỔ</div>
                 <div class="card-desc">Ưu đãi đặc biệt cho khách đặt bàn online tại cơ sở Lê Thái Tổ.</div>
             </div>
             <div class="discount-card">
-                <img src="/media/home/homepic1.png" alt="Butter Vincom">
+                <img src="/media/home/image1.png" alt="Butter Vincom">
                 <div class="discount-label blue">-17%</div>
                 <div class="card-title">Butter Vincom</div>
                 <div class="card-desc">Combo buffet bò Mỹ, hải sản tươi ngon, giá cực tốt.</div>
@@ -144,42 +138,42 @@
         <div class="menu-list">
             <div class="menu-card">
                 <a href="/user/thuc-don/?loai=2">
-                    <img src="/media/home/homepic1.png" alt="Hải sản">
+                    <img src="/media/home/image4.png" alt="Hải sản">
                     <div class="men u-title">Hải sản</div>
                     <div class="menu-count">6 món</div>
                 </a>
             </div>
             <div class="menu-card">
                 <a href="/user/thuc-don/?loai=1">
-                    <img src="/media/home/homepic1.png" alt="Hải sản">
+                    <img src="/media/home/image5.png" alt="Thịt bò">
                     <div class="men u-title">Thịt bò</div>
                     <div class="menu-count">6 món</div>
                 </a>
             </div>
             <div class="menu-card">
                 <a href="/user/thuc-don/?loai=4">
-                    <img src="/media/home/homepic1.png" alt="Hải sản">
+                    <img src="/media/home/image6.png" alt="Thịt heo">
                     <div class="men u-title">Thịt heo</div>
                     <div class="menu-count">6 món</div>
                 </a>
             </div>
             <div class="menu-card">
                 <a href="/user/thuc-don/?loai=6">
-                    <img src="/media/home/homepic1.png" alt="Hải sản">
+                    <img src="/media/home/image7.png" alt="Đậu hũ">
                     <div class="men u-title">Đậu hũ</div>
                     <div class="menu-count">6 món</div>
                 </a>
             </div>
             <div class="menu-card">
                 <a href="/user/thuc-don/?loai=5">
-                    <img src="/media/home/homepic1.png" alt="Hải sản">
+                    <img src="/media/home/image8.png" alt="Nội tạng">
                     <div class="men u-title">Nội tạng</div>
                     <div class="menu-count">6 món</div>
                 </a>
             </div>
             <div class="menu-card">
                 <a href="/user/thuc-don/?loai=8">
-                    <img src="/media/home/homepic1.png" alt="Hải sản">
+                    <img src="/media/home/image9.jpg" alt="Buffet">
                     <div class="men u-title">Buffet</div>
                     <div class="menu-count">6 món</div>
                 </a>

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -95,13 +96,24 @@
             background: #a71d2a;
             color: #fff !important;
         }
+
         .main-content {
             flex: 1;
             display: flex;
+            flex-direction: column; /* thêm dòng này */
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* đổi từ center sang flex-start */
             background: #f5f7fa;
             min-height: 100vh;
+            padding-top: 32px;
+        }
+
+        .main-title {
+            font-size: 2.8rem;
+            color: #007bff;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
         }
         .container {
             background: #fff;
@@ -118,6 +130,18 @@
             font-size: 2.4rem;
             letter-spacing: 1px;
             font-weight: 700;
+        }
+        .home-image {
+            width: 100%;
+            max-width: 1000px;
+            height: auto;
+            margin-top: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .home-image:hover {
+            transform: scale(1.03);
         }
         @media (max-width: 900px) {
             .container {
@@ -177,7 +201,7 @@
 <body>
     <div class="sidebar">
         <div class="btn-group">
-            <a href="{% url 'mo_ban' %}" class="button special">Mở bàn</a>
+            <a href="{% url 'mo_ban' %}" class="button">Mở bàn</a>
             <a href="{% url 'danh_sach_mon_an' %}" class="button">Quản lý món ăn</a>
             <a href="{% url 'danh_sach_ban_an' %}" class="button">Quản lý khu & bàn ăn</a>
             <a href="{% url 'bieu_do_doanh_thu' %}" class="button">Xem tình trạng kinh doanh</a>
@@ -187,9 +211,11 @@
         </div>
     </div>
     <a href="{% url 'logout' %}" class="logout-link-fixed">Đăng xuất</a>
+
     <div class="main-content">
+        <h1 class="main-title">Trang quản trị nhà hàng buffet</h1>
         <div class="container">
-            <h1>Trang quản trị nhà hàng buffet</h1>
+            <img src="/media/home/homepic1.png" alt="Nội tạng" class="home-image">
         </div>
     </div>
 </body>

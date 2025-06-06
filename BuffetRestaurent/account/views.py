@@ -11,6 +11,7 @@ from django.db.models import Sum
 from django.db.models.functions import TruncDate
 from django.views.decorators.http import require_POST
 from django.utils import timezone
+from django.db.models import Q
 
 class MonAnForm(forms.ModelForm):
     class Meta:
@@ -28,7 +29,7 @@ class MonAnForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         image = self.cleaned_data.get('Anh')
-        if image:
+        if image and hasattr(image, 'name'):
             image_path = os.path.join('uploads', image.name)
             full_path = os.path.join(settings.MEDIA_ROOT, image_path)
             with open(full_path, 'wb+') as f:
@@ -93,15 +94,24 @@ def logout_view(request):
 
 def danh_sach_mon_an_view(request):
     selected_loai = request.GET.get('loai', '')
+    search_query = request.GET.get('search', '').strip()
     loai_monan_list = LoaiMonAn.objects.all().order_by('TenLoaiMon')
     data = []
-    for loai in loai_monan_list:
-        monan = MonAn.objects.filter(IdLoaiMonAn=loai).order_by('TenMonAn')
-        data.append({'loai': loai, 'monan_list': monan})
+    if search_query:
+        # Nếu có tìm kiếm, hiển thị tất cả món ăn trùng tên KHÔNG gom nhóm
+        monan_qs = MonAn.objects.filter(TenMonAn__icontains=search_query).order_by('TenMonAn')
+        print(len(monan_qs), "món ăn tìm thấy")
+        data = [{'loai': None, 'monan_list': monan_qs}]
+        selected_loai = ''
+    else:
+        for loai in loai_monan_list:
+            monan = MonAn.objects.filter(IdLoaiMonAn=loai).order_by('TenMonAn')
+            data.append({'loai': loai, 'monan_list': monan})
     return render(request, 'danh_sach_mon_an.html', {
         'data': data,
         'all_loai_monan': loai_monan_list,
-        'selected_loai': selected_loai
+        'selected_loai': selected_loai,
+        'search_query': search_query,
     })
 
 def welcome_view(request):
@@ -303,6 +313,7 @@ def danh_sach_dat_ban_view(request):
     chi_nhanh_id = request.GET.get('chi_nhanh')
     filter_time = request.GET.get('time', '')
     filter_status = request.GET.get('status', '')
+    search_query = request.GET.get('search', '').strip()
     selected_chi_nhanh = None
     datban_qs = DatBan.objects.select_related('chi_nhanh').order_by('-thoi_gian')
     if chi_nhanh_id:
@@ -324,12 +335,16 @@ def danh_sach_dat_ban_view(request):
         datban_qs = datban_qs.filter(trang_thai='da_den')
     elif filter_status == 'chua_den':
         datban_qs = datban_qs.filter(trang_thai='chua_den')
+    # Tìm kiếm theo tên hoặc SĐT
+    if search_query:
+        datban_qs = datban_qs.filter(Q(ten_khach_hang__icontains=search_query) | Q(so_dien_thoai__icontains=search_query))
     return render(request, 'danh_sach_dat_ban.html', {
         'datban_list': datban_qs,
         'chi_nhanh_list': chi_nhanh_list,
         'selected_chi_nhanh': selected_chi_nhanh,
         'filter_time': filter_time,
         'filter_status': filter_status,
+        'search_query': search_query,
     })
 
 @require_POST

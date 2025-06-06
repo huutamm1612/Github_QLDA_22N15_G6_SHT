@@ -160,6 +160,13 @@
         <div class="container">
             <h1>Danh sách món ăn theo loại</h1>
             <div class="top-actions">
+                <form method="get" style="display:inline-block;margin-right:16px;">
+                    <input type="text" name="search" placeholder="Tìm món ăn..." value="{{ request.GET.search|default:'' }}" style="padding:7px 14px;border-radius:6px;border:1px solid #ccc;font-size:1rem;width:200px;">
+                    {% if selected_loai %}
+                        <input type="hidden" name="loai" value="{{ selected_loai }}">
+                    {% endif %}
+                    <button type="submit" style="padding:7px 16px;border-radius:6px;background:#007bff;color:#fff;border:none;font-size:1rem;">Tìm kiếm</button>
+                </form>
                 <a href="{% url 'home' %}" class="home">Về trang chủ</a>
                 <a href="{% url 'them_monan' %}" class="add-monan">+ Thêm món ăn</a>
                 <a href="{% url 'them_loaimonan' %}" class="add-loai">+ Thêm loại món ăn</a>
@@ -181,7 +188,7 @@
                                 {% csrf_token %}
                                 <button type="submit" class="update-btn">Cập nhật trạng thái</button>
                             </form>
-                            <a href="{% url 'sua_monan' monan.id %}" class="edit-btn">Sửa</a>
+                            <a href="#" class="edit-btn" data-monan='{"id":{{ monan.id }},"ten":"{{ monan.TenMonAn|escapejs }}","dongia":{{ monan.DonGia }},"loai_id":{{ monan.IdLoaiMonAn.id }},"trangthai":{{ monan.TrangThai|yesno:'true,false' }}}'>Sửa</a>
                             <form action="{% url 'xoa_monan' monan.id %}" method="post" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa món ăn này?');" class="delete-btn">Xóa</button>
@@ -196,5 +203,70 @@
             {% endfor %}
         </div>
     </div>
+    <div id="modal-edit-monan" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);z-index:1000;align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:32px 36px;border-radius:12px;max-width:420px;width:90vw;box-shadow:0 2px 16px #888;position:relative;">
+        <h2 style="margin-bottom:18px;">Sửa món ăn</h2>
+        <form id="form-edit-monan" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="monan_id" id="edit-monan-id">
+          <div style="margin-bottom:14px;">
+            <label>Tên món ăn:</label>
+            <input type="text" name="TenMonAn" id="edit-monan-ten" required style="width:94%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Đơn giá:</label>
+            <input type="number" name="DonGia" id="edit-monan-dongia" required style="width:94%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Loại món ăn:</label>
+            <select name="IdLoaiMonAn" id="edit-monan-loai" style="width:98%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+              {% for loai in all_loai_monan %}
+                <option value="{{ loai.id }}">{{ loai.TenLoaiMon }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Trạng thái:</label>
+            <select name="TrangThai" id="edit-monan-trangthai" style="width:98%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+              <option value="True">Còn</option>
+              <option value="False">Hết</option>
+            </select>
+          </div>
+          <div style="text-align:right;">
+            <button type="button" onclick="closeEditMonanModal()" style="padding:8px 18px;background:#6c757d;color:#fff;border:none;border-radius:5px;font-size:16px;margin-right:10px;">Hủy</button>
+            <button type="submit" style="padding:8px 18px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;">Lưu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script>
+    function openEditMonanModal(monan) {
+      document.getElementById('modal-edit-monan').style.display = 'flex';
+      document.getElementById('edit-monan-id').value = monan.id;
+      document.getElementById('edit-monan-ten').value = monan.ten;
+      document.getElementById('edit-monan-dongia').value = monan.dongia;
+      document.getElementById('edit-monan-loai').value = monan.loai_id;
+      document.getElementById('edit-monan-trangthai').value = monan.trangthai ? 'True' : 'False';
+    }
+    function closeEditMonanModal() {
+      document.getElementById('modal-edit-monan').style.display = 'none';
+    }
+    document.querySelectorAll('.edit-btn[data-monan]').forEach(function(btn) {
+      btn.onclick = function(e) {
+        e.preventDefault();
+        openEditMonanModal(JSON.parse(this.dataset.monan));
+      };
+    });
+    document.getElementById('form-edit-monan').onsubmit = function(e) {
+      e.preventDefault();
+      var form = e.target;
+      var data = new FormData(form);
+      fetch("{% url 'sua_monan' 0 %}".replace('0', form.monan_id.value), {
+        method: 'POST',
+        headers: { 'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value },
+        body: data
+      }).then(res => res.ok ? location.reload() : alert('Có lỗi xảy ra!'));
+    };
+    </script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 from django.db import models
+from UserInterface.models import ChiNhanh
 
 # Create your models here.
 
@@ -62,7 +63,16 @@ class ChiTietHoaDon(models.Model):
 class NhanVien(models.Model):
     ten_nhan_vien = models.CharField(max_length=100)
     so_dien_thoai = models.CharField(max_length=20)
-    chuc_vu = models.CharField(max_length=50)
+    tai_khoan = models.CharField(max_length=100, unique=True)
+    mat_khau = models.CharField(max_length=128, default='')
+    chi_nhanh = models.ForeignKey(ChiNhanh, on_delete=models.SET_NULL, null=True, blank=True)
+    TINH_TRANG_CHOICES = [
+        ('on', 'Đang làm'),
+        ('off', 'Không làm'),
+        ('on_leave', 'Đang nghỉ phép'),
+        ('quit', 'Đã nghỉ làm'),
+    ]
+    tinh_trang = models.CharField(max_length=10, choices=TINH_TRANG_CHOICES, default='off')
 
     def __str__(self):
-        return f"{self.ten_nhan_vien} ({self.chuc_vu})"
+        return f"{self.ten_nhan_vien} ({self.tai_khoan})"

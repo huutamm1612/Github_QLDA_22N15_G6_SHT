@@ -111,15 +111,9 @@ def danh_sach_mon_an_view(request):
     search_query = request.GET.get('search', '').strip()
     loai_monan_list = LoaiMonAn.objects.all().order_by('TenLoaiMon')
     data = []
-    if search_query:
-        # Nếu có tìm kiếm, hiển thị tất cả món ăn trùng tên KHÔNG gom nhóm
-        monan_qs = MonAn.objects.filter(TenMonAn__icontains=search_query).order_by('TenMonAn')
-        data = [{'loai': None, 'monan_list': monan_qs}]
-        selected_loai = ''
-    else:
-        for loai in loai_monan_list:
-            monan = MonAn.objects.filter(IdLoaiMonAn=loai).order_by('TenMonAn')
-            data.append({'loai': loai, 'monan_list': monan})
+    for loai in loai_monan_list:
+        monan = MonAn.objects.filter(IdLoaiMonAn=loai).order_by('TenMonAn')
+        data.append({'loai': loai, 'monan_list': monan})
     return render(request, 'danh_sach_mon_an.html', {
         'data': data,
         'all_loai_monan': loai_monan_list,

@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from .views import them_nhan_vien_view
+from .views import sua_nhan_vien_view
 
 urlpatterns = [
     path('', views.home_view, name='home'),
@@ -22,6 +24,8 @@ urlpatterns = [
     path('mo-ban/', views.mo_ban_view, name='mo_ban'),
     path('bieu-do-doanh-thu/', views.bieu_do_doanh_thu_view, name='bieu_do_doanh_thu'),
     path('nhan-vien/', views.danh_sach_nhan_vien_view, name='danh_sach_nhan_vien'),
+    path('them-nhan-vien/', them_nhan_vien_view, name='them_nhan_vien'),
+    path('sua-nhan-vien/', sua_nhan_vien_view, name='sua_nhan_vien'),
     path('dat-ban/', views.danh_sach_dat_ban_view, name='danh_sach_dat_ban'),
     path('dat-ban/xac-nhan/<int:datban_id>/', views.xac_nhan_dat_ban_view, name='xac_nhan_dat_ban'),
     path('dat-ban/huy/<int:datban_id>/', views.huy_dat_ban_view, name='huy_dat_ban'),

@@ -11,6 +11,9 @@ from django.db.models import Sum
 from django.db.models.functions import TruncDate
 from django.views.decorators.http import require_POST
 from django.utils import timezone
+from django.db.models import Q
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 class MonAnForm(forms.ModelForm):
     class Meta:
@@ -28,7 +31,7 @@ class MonAnForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         image = self.cleaned_data.get('Anh')
-        if image:
+        if image and hasattr(image, 'name'):
             image_path = os.path.join('uploads', image.name)
             full_path = os.path.join(settings.MEDIA_ROOT, image_path)
             with open(full_path, 'wb+') as f:
@@ -78,13 +81,25 @@ def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        try:
-            account = Account.objects.get(username=username, password=password)
-            # Đăng nhập thành công, chuyển hướng sang trang home
-            request.session['account_id'] = account.id
-            return redirect('home')
-        except Account.DoesNotExist:
-            error = 'Tên đăng nhập hoặc mật khẩu không đúng.'
+        login_role = request.POST.get('login_role')
+        if login_role == 'admin':
+            try:
+                account = Account.objects.get(username=username, password=password)
+                request.session['account_id'] = account.id
+                request.session['role'] = 'admin'
+                return redirect('home')
+            except Account.DoesNotExist:
+                error = 'Tên đăng nhập hoặc mật khẩu không đúng (Admin).'
+        elif login_role == 'nhanvien':
+            try:
+                nv = NhanVien.objects.get(tai_khoan=username, mat_khau=password)
+                request.session['nhanvien_id'] = nv.id
+                request.session['role'] = 'nhanvien'
+                return redirect('home')
+            except NhanVien.DoesNotExist:
+                error = 'Tên đăng nhập hoặc mật khẩu không đúng (Nhân viên).'
+        else:
+            error = 'Vui lòng chọn vai trò đăng nhập.'
     return render(request, 'login.html', {'error': error})
 
 def logout_view(request):
@@ -93,6 +108,7 @@ def logout_view(request):
 
 def danh_sach_mon_an_view(request):
     selected_loai = request.GET.get('loai', '')
+    search_query = request.GET.get('search', '').strip()
     loai_monan_list = LoaiMonAn.objects.all().order_by('TenLoaiMon')
     data = []
     for loai in loai_monan_list:
@@ -101,7 +117,8 @@ def danh_sach_mon_an_view(request):
     return render(request, 'danh_sach_mon_an.html', {
         'data': data,
         'all_loai_monan': loai_monan_list,
-        'selected_loai': selected_loai
+        'selected_loai': selected_loai,
+        'search_query': search_query,
     })
 
 def welcome_view(request):
@@ -283,26 +300,67 @@ def mo_ban_view(request):
     return render(request, 'mo_ban.html', context)
 
 def bieu_do_doanh_thu_view(request):
+    filter = request.GET.get('filter', 'all')
+    now = timezone.localtime(timezone.now())
+    qs = HoaDon.objects.filter(TrangThai=True)
+    if filter == 'today':
+        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+        qs = qs.filter(timeout__range=(start, end))
+    elif filter == 'week':
+        start = now - timezone.timedelta(days=now.weekday())  # Đầu tuần (thứ 2)
+        start = start.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+        qs = qs.filter(timeout__range=(start, end))
+    elif filter == 'month':
+        start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+        qs = qs.filter(timeout__range=(start, end))
     doanh_thu_ngay = (
-        HoaDon.objects.filter(TrangThai=True)
-        .annotate(ngay=TruncDate('timeout'))
+        qs.annotate(ngay=TruncDate('timeout'))
         .values('ngay')
         .annotate(tong=Sum('TongTien'))
         .order_by('ngay')
     )
     labels = [str(dt['ngay']) for dt in doanh_thu_ngay]
     data = [float(dt['tong']) for dt in doanh_thu_ngay]
-    return render(request, 'bieu_do_doanh_thu.html', {'labels': labels, 'data': data})
+    return render(request, 'bieu_do_doanh_thu.html', {'labels': labels, 'data': data, 'filter': filter})
 
 def danh_sach_nhan_vien_view(request):
-    nhan_vien_list = NhanVien.objects.all().order_by('id')
-    return render(request, 'danh_sach_nhan_vien.html', {'nhan_vien_list': nhan_vien_list})
+    from UserInterface.models import ChiNhanh
+    chi_nhanh_id = request.GET.get('chi_nhanh')
+    tinh_trang = request.GET.get('tinh_trang', '')
+    search_query = request.GET.get('search', '').strip()
+    nhan_vien_qs = NhanVien.objects.all().order_by('id')
+    selected_chi_nhanh = None
+    selected_tinh_trang = tinh_trang
+    if chi_nhanh_id:
+        try:
+            selected_chi_nhanh = ChiNhanh.objects.get(id=chi_nhanh_id)
+            nhan_vien_qs = nhan_vien_qs.filter(chi_nhanh=selected_chi_nhanh)
+        except ChiNhanh.DoesNotExist:
+            selected_chi_nhanh = None
+    if tinh_trang:
+        nhan_vien_qs = nhan_vien_qs.filter(tinh_trang=tinh_trang)
+    if search_query:
+        nhan_vien_qs = nhan_vien_qs.filter(
+            Q(ten_nhan_vien__icontains=search_query) | Q(so_dien_thoai__icontains=search_query)
+        )
+    chi_nhanh_list = ChiNhanh.objects.all()
+    return render(request, 'danh_sach_nhan_vien.html', {
+        'nhan_vien_list': nhan_vien_qs,
+        'chi_nhanh_list': chi_nhanh_list,
+        'selected_chi_nhanh': selected_chi_nhanh,
+        'selected_tinh_trang': selected_tinh_trang,
+        'search_query': search_query,
+    })
 
 def danh_sach_dat_ban_view(request):
     chi_nhanh_list = ChiNhanh.objects.all()
     chi_nhanh_id = request.GET.get('chi_nhanh')
     filter_time = request.GET.get('time', '')
     filter_status = request.GET.get('status', '')
+    search_query = request.GET.get('search', '').strip()
     selected_chi_nhanh = None
     datban_qs = DatBan.objects.select_related('chi_nhanh').order_by('-thoi_gian')
     if chi_nhanh_id:
@@ -324,12 +382,16 @@ def danh_sach_dat_ban_view(request):
         datban_qs = datban_qs.filter(trang_thai='da_den')
     elif filter_status == 'chua_den':
         datban_qs = datban_qs.filter(trang_thai='chua_den')
+    # Tìm kiếm theo tên hoặc SĐT
+    if search_query:
+        datban_qs = datban_qs.filter(Q(ten_khach_hang__icontains=search_query) | Q(so_dien_thoai__icontains=search_query))
     return render(request, 'danh_sach_dat_ban.html', {
         'datban_list': datban_qs,
         'chi_nhanh_list': chi_nhanh_list,
         'selected_chi_nhanh': selected_chi_nhanh,
         'filter_time': filter_time,
         'filter_status': filter_status,
+        'search_query': search_query,
     })
 
 @require_POST
@@ -379,3 +441,69 @@ def xoa_chi_nhanh_view(request, cn_id):
         cn.delete()
         return redirect('danh_sach_chi_nhanh')
     return redirect('danh_sach_chi_nhanh')
+
+@csrf_exempt
+def them_nhan_vien_view(request):
+    from UserInterface.models import ChiNhanh
+    if request.method == 'POST':
+        ten_nhan_vien = request.POST.get('ten_nhan_vien', '').strip()
+        so_dien_thoai = request.POST.get('so_dien_thoai', '').strip()
+        tai_khoan = request.POST.get('tai_khoan', '').strip()
+        mat_khau = request.POST.get('mat_khau', '').strip()
+        chi_nhanh_id = request.POST.get('chi_nhanh')
+        tinh_trang = request.POST.get('tinh_trang', 'off')
+        chi_nhanh = ChiNhanh.objects.filter(id=chi_nhanh_id).first() if chi_nhanh_id else None
+        if ten_nhan_vien and so_dien_thoai and tai_khoan and mat_khau and chi_nhanh:
+            if not NhanVien.objects.filter(tai_khoan=tai_khoan).exists():
+                NhanVien.objects.create(
+                    ten_nhan_vien=ten_nhan_vien,
+                    so_dien_thoai=so_dien_thoai,
+                    tai_khoan=tai_khoan,
+                    mat_khau=mat_khau,
+                    chi_nhanh=chi_nhanh,
+                    tinh_trang=tinh_trang or 'off',
+                )
+                return redirect('danh_sach_nhan_vien')
+            else:
+                return render(request, 'danh_sach_nhan_vien.html', {
+                    'nhan_vien_list': NhanVien.objects.all().order_by('id'),
+                    'chi_nhanh_list': ChiNhanh.objects.all(),
+                    'error': 'Tài khoản đã tồn tại!'
+                })
+        else:
+            return render(request, 'danh_sach_nhan_vien.html', {
+                'nhan_vien_list': NhanVien.objects.all().order_by('id'),
+                'chi_nhanh_list': ChiNhanh.objects.all(),
+                'error': 'Vui lòng nhập đầy đủ thông tin và chọn chi nhánh!'
+            })
+    return redirect('danh_sach_nhan_vien')
+
+@csrf_exempt
+def sua_nhan_vien_view(request):
+    from UserInterface.models import ChiNhanh
+    if request.method == 'POST':
+        nv_id = request.POST.get('id')
+        ten_nhan_vien = request.POST.get('ten_nhan_vien', '').strip()
+        so_dien_thoai = request.POST.get('so_dien_thoai', '').strip()
+        tai_khoan = request.POST.get('tai_khoan', '').strip()
+        mat_khau = request.POST.get('mat_khau', '').strip()
+        chi_nhanh_id = request.POST.get('chi_nhanh')
+        tinh_trang = request.POST.get('tinh_trang', 'off')
+        chi_nhanh = ChiNhanh.objects.filter(id=chi_nhanh_id).first() if chi_nhanh_id else None
+        if not (nv_id and ten_nhan_vien and so_dien_thoai and tai_khoan and mat_khau and chi_nhanh):
+            return JsonResponse({'success': False, 'message': 'Vui lòng nhập đầy đủ thông tin!'}, status=400)
+        nv = NhanVien.objects.filter(id=nv_id).first()
+        if not nv:
+            return JsonResponse({'success': False, 'message': 'Nhân viên không tồn tại!'}, status=404)
+        # Kiểm tra tài khoản trùng (trừ chính nó)
+        if NhanVien.objects.exclude(id=nv_id).filter(tai_khoan=tai_khoan).exists():
+            return JsonResponse({'success': False, 'message': 'Tài khoản đã tồn tại!'}, status=400)
+        nv.ten_nhan_vien = ten_nhan_vien
+        nv.so_dien_thoai = so_dien_thoai
+        nv.tai_khoan = tai_khoan
+        nv.mat_khau = mat_khau
+        nv.chi_nhanh = chi_nhanh
+        nv.tinh_trang = tinh_trang
+        nv.save()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'message': 'Chỉ hỗ trợ POST'}, status=405)

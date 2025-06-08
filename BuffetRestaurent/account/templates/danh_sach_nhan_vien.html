@@ -17,13 +17,34 @@
 <body>
     <div class="container">
         <h1>Danh sách nhân viên</h1>
+        <button onclick="openAddNhanVienModal()" style="margin-bottom:18px;padding:10px 22px;background:#28a745;color:#fff;border:none;border-radius:7px;font-size:1.08rem;font-weight:600;cursor:pointer;">+ Thêm nhân viên</button>
+        <form method="get" style="margin-bottom:18px;display:flex;align-items:center;gap:16px;">
+            <label for="filter_chi_nhanh">Lọc chi nhánh:</label>
+            <select name="chi_nhanh" id="filter_chi_nhanh" onchange="this.form.submit()" style="padding:6px 12px;border-radius:6px;border:1px solid #ccc;">
+                <option value="">Tất cả</option>
+                {% for cn in chi_nhanh_list %}
+                    <option value="{{ cn.id }}" {% if selected_chi_nhanh and cn.id == selected_chi_nhanh.id %}selected{% endif %}>{{ cn.ten_chi_nhanh }}</option>
+                {% endfor %}
+            </select>
+            <label for="filter_tinh_trang">Tình trạng:</label>
+            <select name="tinh_trang" id="filter_tinh_trang" onchange="this.form.submit()" style="padding:6px 12px;border-radius:6px;border:1px solid #ccc;">
+                <option value="">Tất cả</option>
+                <option value="on" {% if selected_tinh_trang == 'on' %}selected{% endif %}>Đang làm</option>
+                <option value="off" {% if selected_tinh_trang == 'off' %}selected{% endif %}>Nghỉ tạm thời</option>
+                <option value="on_leave" {% if selected_tinh_trang == 'on_leave' %}selected{% endif %}>Đang nghỉ phép</option>
+                <option value="quit" {% if selected_tinh_trang == 'quit' %}selected{% endif %}>Đã nghỉ việc</option>
+            </select>
+            <input type="text" name="search" placeholder="Tìm tên/SĐT..." value="{{ search_query|default:'' }}" style="padding:6px 12px;border-radius:6px;border:1px solid #ccc;min-width:180px;" />
+            <button type="submit" style="padding:6px 18px;border-radius:6px;background:#007bff;color:#fff;border:none;">Lọc</button>
+        </form>
         <table>
             <thead>
                 <tr>
                     <th>Mã NV</th>
                     <th>Tên nhân viên</th>
                     <th>Số điện thoại</th>
-                    <th>Chức vụ</th>
+                    <th>Tình trạng</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,14 +53,151 @@
                     <td>{{ nv.id }}</td>
                     <td>{{ nv.ten_nhan_vien }}</td>
                     <td>{{ nv.so_dien_thoai }}</td>
-                    <td>{{ nv.chuc_vu }}</td>
+                    <td>{{ nv.get_tinh_trang_display }}</td>
+                    <td>
+                        <button onclick="openEditNhanVienModal({{ nv.id }}, '{{ nv.ten_nhan_vien|escapejs }}', '{{ nv.so_dien_thoai|escapejs }}', '{{ nv.tai_khoan|escapejs }}', '{{ nv.mat_khau|escapejs }}', '{{ nv.chi_nhanh_id }}', '{{ nv.tinh_trang }}')" style="padding:6px 14px;background:#ffc107;color:#222;border:none;border-radius:5px;font-size:15px;">Sửa</button>
+                    </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="4" style="text-align:center;">Chưa có nhân viên nào.</td></tr>
+                <tr><td colspan="5" style="text-align:center;">Chưa có nhân viên nào.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
         <a href="{% url 'home' %}" class="back-link">&larr; Về trang chủ</a>
     </div>
+    <div id="modal-add-nhanvien" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);z-index:1000;align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:32px 36px;border-radius:12px;max-width:420px;width:90vw;box-shadow:0 2px 16px #888;position:relative;">
+        <h2 style="margin-bottom:18px;">Thêm nhân viên</h2>
+        <form id="form-add-nhanvien" method="post">
+          {% csrf_token %}
+          <div style="margin-bottom:14px;">
+            <label>Tên nhân viên:</label>
+            <input type="text" name="ten_nhan_vien" required style="width:94%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Số điện thoại:</label>
+            <input type="text" name="so_dien_thoai" required style="width:94%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Tài khoản:</label>
+            <input type="text" name="tai_khoan" required style="width:94%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Mật khẩu:</label>
+            <input type="password" name="mat_khau" required style="width:94%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Chi nhánh:</label>
+            <select name="chi_nhanh" style="width:98%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+              <option value="">-- Chọn chi nhánh --</option>
+              {% for cn in chi_nhanh_list %}
+                <option value="{{ cn.id }}">{{ cn.ten_chi_nhanh }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Tình trạng:</label>
+            <select name="tinh_trang" style="width:98%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+              <option value="on">Đang làm</option>
+              <option value="off" selected>Nghỉ tạm thời</option>
+              <option value="on_leave">Đang nghỉ phép</option>
+              <option value="quit">Đã nghỉ việc</option>
+            </select>
+          </div>
+          <div style="text-align:right;">
+            <button type="button" onclick="closeAddNhanVienModal()" style="padding:8px 18px;background:#6c757d;color:#fff;border:none;border-radius:5px;font-size:16px;margin-right:10px;">Hủy</button>
+            <button type="submit" style="padding:8px 18px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;">Lưu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="modal-edit-nhanvien" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);z-index:1000;align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:32px 36px;border-radius:12px;max-width:420px;width:90vw;box-shadow:0 2px 16px #888;position:relative;">
+        <h2 style="margin-bottom:18px;">Sửa thông tin nhân viên</h2>
+        <form id="form-edit-nhanvien" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="id" id="edit-nv-id">
+          <div style="margin-bottom:14px;">
+            <label>Tên nhân viên:</label>
+            <input type="text" name="ten_nhan_vien" id="edit-ten-nhan-vien" required style="width:94%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Số điện thoại:</label>
+            <input type="text" name="so_dien_thoai" id="edit-so-dien-thoai" required style="width:94%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Tài khoản:</label>
+            <input type="text" name="tai_khoan" id="edit-tai-khoan" required style="width:94%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Mật khẩu:</label>
+            <input type="text" name="mat_khau" id="edit-mat-khau" required style="width:94%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Chi nhánh:</label>
+            <select name="chi_nhanh" id="edit-chi-nhanh" style="width:98%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+              <option value="">-- Chọn chi nhánh --</option>
+              {% for cn in chi_nhanh_list %}
+                <option value="{{ cn.id }}">{{ cn.ten_chi_nhanh }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label>Tình trạng:</label>
+            <select name="tinh_trang" id="edit-tinh-trang" style="width:98%;padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
+              <option value="on">Đang làm</option>
+              <option value="off">Nghỉ tạm thời</option>
+              <option value="on_leave">Đang nghỉ phép</option>
+              <option value="quit">Đã nghỉ việc</option>
+            </select>
+          </div>
+          <div style="text-align:right;">
+            <button type="button" onclick="closeEditNhanVienModal()" style="padding:8px 18px;background:#6c757d;color:#fff;border:none;border-radius:5px;font-size:16px;margin-right:10px;">Hủy</button>
+            <button type="submit" style="padding:8px 18px;background:#007bff;color:#fff;border:none;border-radius:5px;font-size:16px;">Lưu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script>
+    function openAddNhanVienModal() {
+      document.getElementById('modal-add-nhanvien').style.display = 'flex';
+    }
+    function closeAddNhanVienModal() {
+      document.getElementById('modal-add-nhanvien').style.display = 'none';
+    }
+    function openEditNhanVienModal(id, ten, sdt, tk, mk, cn_id, tinh_trang) {
+      document.getElementById('modal-edit-nhanvien').style.display = 'flex';
+      document.getElementById('edit-nv-id').value = id;
+      document.getElementById('edit-ten-nhan-vien').value = ten;
+      document.getElementById('edit-so-dien-thoai').value = sdt;
+      document.getElementById('edit-tai-khoan').value = tk;
+      document.getElementById('edit-mat-khau').value = mk;
+      document.getElementById('edit-chi-nhanh').value = cn_id;
+      document.getElementById('edit-tinh-trang').value = tinh_trang;
+    }
+    function closeEditNhanVienModal() {
+      document.getElementById('modal-edit-nhanvien').style.display = 'none';
+    }
+    document.getElementById('form-add-nhanvien').onsubmit = function(e) {
+      e.preventDefault();
+      var form = e.target;
+      var data = new FormData(form);
+      fetch("{% url 'them_nhan_vien' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value },
+        body: data
+      }).then(res => res.ok ? location.reload() : alert('Có lỗi xảy ra!'));
+    };
+    document.getElementById('form-edit-nhanvien').onsubmit = function(e) {
+      e.preventDefault();
+      var form = e.target;
+      var data = new FormData(form);
+      fetch("{% url 'sua_nhan_vien' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value },
+        body: data
+      }).then(res => res.ok ? location.reload() : alert('Có lỗi xảy ra khi sửa!'));
+    };
+    </script>
 </body>
 </html>

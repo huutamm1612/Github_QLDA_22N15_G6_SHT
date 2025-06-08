@@ -19,10 +19,26 @@
 </head>
 <body>
     <div class="container">
-        <h2>Biểu đồ doanh thu theo ngày</h2>
-        <canvas id="doanhThuChart" width="800" height="400"></canvas>
-        <a href="{% url 'home' %}" class="back-link">&larr; Về trang chủ 123123</a>
+        <h2>Biểu đồ doanh thu</h2>
+        <form method="get" style="display:flex;gap:18px;align-items:center;justify-content:center;margin-bottom:18px;">
+            <label for="filter">Xem theo:</label>
+            <select name="filter" id="filter" onchange="this.form.submit()" style="padding:6px 14px;border-radius:6px;border:1px solid #ccc;">
+                <option value="all" {% if filter == 'all' or not filter %}selected{% endif %}>Tất cả</option>
+                <option value="today" {% if filter == 'today' %}selected{% endif %}>Hôm nay</option>
+                <option value="week" {% if filter == 'week' %}selected{% endif %}>1 tuần</option>
+                <option value="month" {% if filter == 'month' %}selected{% endif %}>1 tháng</option>
+            </select>
+        </form>
+        {% if filter == 'today' %}
+            <div style="text-align:center;font-size:2.2rem;font-weight:bold;color:#2196f3;margin:40px 0 60px 0;">
+                Doanh thu hôm nay: <span style="color:#e74c3c">{{ data.0|floatformat:0|default:'0' }} VNĐ</span>
+            </div>
+        {% else %}
+            <canvas id="doanhThuChart" width="800" height="400"></canvas>
+        {% endif %}
+        <a href="{% url 'home' %}" class="back-link">&larr; Về trang chủ</a>
     </div>
+    {% if filter != 'today' %}
     <script>
         const ctx = document.getElementById('doanhThuChart').getContext('2d');
         const doanhThuChart = new Chart(ctx, {
@@ -46,5 +62,6 @@
             }
         });
     </script>
+    {% endif %}
 </body>
 </html>

@@ -66,6 +66,13 @@ def xem_hoa_don_view(request, ban_id):
     if request.GET.get('thanh_toan') == '1' and request.method == 'POST':
         if not hoadon:
             return JsonResponse({'success': False, 'message': 'Không có hóa đơn để thanh toán.'})
+        # Tính lại tổng tiền thực tế các món
+        tong_tien = 0
+        for ct in hoadon.chi_tiet.all():
+            tong_tien += ct.SoLuong * ct.MonAn.DonGia
+        hoadon.TongTien = tong_tien
+        from django.utils import timezone
+        hoadon.timeout = timezone.now()  # Ghi nhận thời điểm thanh toán
         hoadon.TrangThai = True
         hoadon.save()
         ban.TrangThai = True

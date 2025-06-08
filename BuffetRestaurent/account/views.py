@@ -300,16 +300,31 @@ def mo_ban_view(request):
     return render(request, 'mo_ban.html', context)
 
 def bieu_do_doanh_thu_view(request):
+    filter = request.GET.get('filter', 'all')
+    now = timezone.localtime(timezone.now())
+    qs = HoaDon.objects.filter(TrangThai=True)
+    if filter == 'today':
+        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+        qs = qs.filter(timeout__range=(start, end))
+    elif filter == 'week':
+        start = now - timezone.timedelta(days=now.weekday())  # Đầu tuần (thứ 2)
+        start = start.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+        qs = qs.filter(timeout__range=(start, end))
+    elif filter == 'month':
+        start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+        qs = qs.filter(timeout__range=(start, end))
     doanh_thu_ngay = (
-        HoaDon.objects.filter(TrangThai=True)
-        .annotate(ngay=TruncDate('timeout'))
+        qs.annotate(ngay=TruncDate('timeout'))
         .values('ngay')
         .annotate(tong=Sum('TongTien'))
         .order_by('ngay')
     )
     labels = [str(dt['ngay']) for dt in doanh_thu_ngay]
     data = [float(dt['tong']) for dt in doanh_thu_ngay]
-    return render(request, 'bieu_do_doanh_thu.html', {'labels': labels, 'data': data})
+    return render(request, 'bieu_do_doanh_thu.html', {'labels': labels, 'data': data, 'filter': filter})
 
 def danh_sach_nhan_vien_view(request):
     from UserInterface.models import ChiNhanh
